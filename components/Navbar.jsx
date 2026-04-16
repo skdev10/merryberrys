@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { ShoppingCart, Search, User, Menu, X, Heart } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { formatPKR, FREE_SHIPPING_MIN_PKR } from '@/lib/currency';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,7 +26,7 @@ export default function Navbar() {
       <div className="bg-gradient-to-r from-berry-900 via-berry-800 to-berry-900 text-white text-center py-2 text-sm">
         <p className="flex items-center justify-center gap-2">
           <span className="hidden sm:inline">✨</span>
-          Free Shipping on Orders Over $50 | Use Code <span className="font-bold text-gold-400">MERRY20</span> for 20% Off
+          Free shipping on orders over {formatPKR(FREE_SHIPPING_MIN_PKR)} | Use Code <span className="font-bold text-gold-400">MERRY20</span> for 20% Off
           <span className="hidden sm:inline">✨</span>
         </p>
       </div>

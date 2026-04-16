@@ -1,6 +1,10 @@
 'use client';
 import Image from 'next/image';
 import LuxuryNavbar from '../../components/LuxuryNavbar';
+import { SITE } from '@/lib/site';
+
+const px = (id, w = 800) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${w}`;
 
 export default function AboutPage() {
   return (
@@ -27,7 +31,7 @@ export default function AboutPage() {
             </div>
             <div className="relative aspect-[4/5] lg:aspect-[3/4]">
               <Image
-                src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80"
+                src={px('1040945')}
                 alt="Our Story"
                 fill
                 className="object-cover"
@@ -76,7 +80,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
               <div className="relative aspect-[4/3]">
                 <Image
-                  src="https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&q=80"
+                  src={px('1926764')}
                   alt="Craftsmanship"
                   fill
                   className="object-cover"
@@ -132,12 +136,12 @@ export default function AboutPage() {
                 {
                   name: 'Sarah Mitchell',
                   role: 'Creative Director',
-                  image: 'https://images.unsplash.com/photo-1494790108377-be9c29b593a4?w=400&q=80'
+                  image: px('774909', 400)
                 },
                 {
                   name: 'James Chen',
                   role: 'Founder & CEO',
-                  image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80'
+                  image: px('1181690', 400)
                 }
               ].map((person, index) => (
                 <div key={index} className="text-center">
@@ -213,9 +217,13 @@ export default function AboutPage() {
             <div>
               <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Contact</h3>
               <ul className="space-y-3 text-sm text-luxury-white/60">
-                <li>hello@merryberry.com</li>
-                <li>+1 (800) 123-4567</li>
-                <li>123 Fashion Avenue<br />New York, NY 10001</li>
+                <li>
+                  <a href={`mailto:${SITE.email}`} className="hover:text-luxury-gold transition-colors">{SITE.email}</a>
+                </li>
+                <li>
+                  <a href={`tel:${SITE.phoneTel}`} className="hover:text-luxury-gold transition-colors">{SITE.phoneDisplay}</a>
+                </li>
+                <li>Pakistan</li>
               </ul>
             </div>
           </div>
@@ -225,15 +233,22 @@ export default function AboutPage() {
               © 2026 Merry Berry. All rights reserved.
             </p>
             <div className="flex gap-6">
-              {['Instagram', 'Facebook', 'Pinterest'].map((social) => (
-                <a 
-                  key={social}
-                  href="#"
-                  className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors"
-                >
-                  {social}
-                </a>
-              ))}
+              <a
+                href={SITE.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors"
+              >
+                Instagram
+              </a>
+              <a
+                href={SITE.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors"
+              >
+                Facebook
+              </a>
             </div>
           </div>
         </div>

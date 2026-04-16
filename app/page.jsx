@@ -1,68 +1,90 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import LuxuryNavbar from '../components/LuxuryNavbar';
-import { ArrowRight, ArrowDown, Star, Truck, Shield, RefreshCw } from 'lucide-react';
+import HeroCarousel from '../components/HeroCarousel';
+import { ArrowRight, Truck, Shield, RefreshCw } from 'lucide-react';
+import {
+  heroSlides,
+  collectionTiles,
+  editorialBannerSrc,
+  PRODUCT_IMAGE_FALLBACK,
+} from '@/lib/brandAssets';
+import { formatPKR, FREE_SHIPPING_MIN_PKR } from '@/lib/currency';
+import { SITE } from '@/lib/site';
 
-// Premium fashion images from reference websites
-const heroImages = [
-  'https://innovecouture.vamtam.com/wp-content/uploads/2024/02/1034336401_1_1_1-683x1024.jpg',
-  'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=80',
-  'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=80',
-];
+const px800 = (id) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=800`;
 
-const collectionImages = [
-  { 
-    src: 'https://innovecouture.vamtam.com/wp-content/uploads/2024/02/1034336401_1_1_1-683x1024.jpg',
-    title: 'Summer Collection',
-    subtitle: '2026'
+const fallbackProducts = [
+  {
+    id: 1,
+    name: 'Silk Evening Dress',
+    price: 12999,
+    image: px800('1040945'),
+    hoverImage: px800('1536619'),
   },
-  { 
-    src: 'https://images.unsplash.com/photo-1515886657613-9f751a206bb1?w=800&q=80',
-    title: 'Evening Wear',
-    subtitle: 'Exclusive'
+  {
+    id: 2,
+    name: 'Tailored Wool Coat',
+    price: 18999,
+    image: px800('1926764'),
+    hoverImage: px800('1462637'),
   },
-  { 
-    src: 'https://images.unsplash.com/photo-1496745911865-6eaf0df0dc4b?w=800&q=80',
-    title: 'Essentials',
-    subtitle: 'New In'
+  {
+    id: 3,
+    name: 'Cashmere Sweater',
+    price: 9999,
+    image: px800('1346187'),
+    hoverImage: PRODUCT_IMAGE_FALLBACK,
   },
-];
-
-const products = [
-  { 
-    id: 1, 
-    name: 'Silk Evening Dress', 
-    price: 485, 
-    image: 'https://innovecouture.vamtam.com/wp-content/uploads/2024/02/1034336401_1_1_1-683x1024.jpg',
-    hoverImage: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&q=80'
-  },
-  { 
-    id: 2, 
-    name: 'Tailored Wool Coat', 
-    price: 650, 
-    image: 'https://images.unsplash.com/photo-1539533018447-63fcce268581?w=600&q=80',
-    hoverImage: 'https://images.unsplash.com/photo-1544022613-e19bbf6e1e1b?w=600&q=80'
-  },
-  { 
-    id: 3, 
-    name: 'Cashmere Sweater', 
-    price: 295, 
-    image: 'https://images.unsplash.com/photo-1578587018459-a29373b36ff0?w=600&q=80',
-    hoverImage: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d933?w=600&q=80'
-  },
-  { 
-    id: 4, 
-    name: 'Linen Blazer', 
-    price: 420, 
-    image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80',
-    hoverImage: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80'
+  {
+    id: 4,
+    name: 'Linen Blazer',
+    price: 14999,
+    image: px800('1484822'),
+    hoverImage: px800('1188750'),
   },
 ];
 
 export default function LuxuryHome() {
   const revealRefs = useRef([]);
+  const [products, setProducts] = useState(fallbackProducts);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/products?limit=8');
+        const data = await res.json();
+        const list = data.products || [];
+        if (!list.length || cancelled) return;
+        const mapped = list.slice(0, 8).map((p) => {
+          let imgs = [];
+          try {
+            imgs = JSON.parse(p.images || '[]');
+          } catch {
+            imgs = [];
+          }
+          const hover = imgs[1] || imgs[0] || PRODUCT_IMAGE_FALLBACK;
+          return {
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            image: imgs[0] || hover,
+            hoverImage: hover,
+          };
+        });
+        setProducts(mapped);
+      } catch {
+        /* keep fallback */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -73,15 +95,17 @@ export default function LuxuryHome() {
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
     );
 
-    revealRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
+    const nodes = revealRefs.current.filter(Boolean);
+    nodes.forEach((el) => observer.observe(el));
 
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      nodes.forEach((el) => observer.unobserve(el));
+      observer.disconnect();
+    };
+  }, [products]);
 
   const addToRefs = (el) => {
     if (el && !revealRefs.current.includes(el)) {
@@ -94,83 +118,44 @@ export default function LuxuryHome() {
       <LuxuryNavbar />
       
       <main className="bg-luxury-white">
-        {/* Hero Section */}
-        <section className="relative h-screen min-h-[700px] flex items-center">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <Image
-              src={heroImages[0]}
-              alt="Luxury Fashion"
-              fill
-              className="object-cover object-center"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-luxury-white/90 via-luxury-white/40 to-transparent" />
-          </div>
-
-          {/* Hero Content */}
-          <div className="container-luxury relative z-10 pt-20">
-            <div className="max-w-2xl">
-              <p className="text-luxury-caption text-luxury-taupe mb-6 fade-in">
-                New Collection 2026
-              </p>
-              <h1 className="text-luxury-heading text-luxury-black mb-8 fade-in fade-in-delay-1">
-                Elegance<br />
-                <span className="italic font-light">Redefined</span>
-              </h1>
-              <p className="text-luxury-body text-luxury-taupe mb-10 max-w-md fade-in fade-in-delay-2">
-                Discover our latest collection of premium garments crafted with meticulous attention to detail and timeless sophistication.
-              </p>
-              <div className="flex flex-wrap gap-4 fade-in fade-in-delay-3">
-                <Link href="/shop" className="btn-luxury">
-                  <span>Shop Collection</span>
-                </Link>
-                <Link href="/collections" className="btn-luxury-outline">
-                  <span>View Lookbook</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-luxury-taupe">
-            <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-            <ArrowDown size={16} className="animate-bounce" />
-          </div>
-        </section>
+        {/* Hero Carousel */}
+        <HeroCarousel slides={heroSlides} intervalMs={6500} />
 
         {/* Featured Collections */}
         <section className="section-luxury bg-luxury-cream">
           <div className="container-luxury">
-            <div ref={addToRefs} className="reveal text-center mb-16">
-              <p className="text-luxury-caption text-luxury-taupe mb-4">Curated Selection</p>
-              <h2 className="text-luxury-subheading text-luxury-black">
-                Featured Collections
+            <div ref={addToRefs} className="reveal reveal-on-scroll text-center mb-12 md:mb-16">
+              <p className="text-luxury-caption text-luxury-taupe mb-4">Curated selection</p>
+              <h2 className="text-luxury-subheading text-luxury-black px-2">
+                Featured collections
               </h2>
+              <p className="text-luxury-body text-luxury-taupe mt-4 max-w-xl mx-auto">
+                Three edits to start browsing—each link takes you to the shop with the right context.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {collectionImages.map((collection, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+              {collectionTiles.map((collection, index) => (
                 <Link 
-                  key={index}
-                  href="/shop"
+                  key={collection.id}
+                  href={collection.href}
                   ref={addToRefs}
-                  className="reveal group relative aspect-[3/4] overflow-hidden"
+                  className="reveal reveal-on-scroll group relative aspect-[3/4] min-h-[280px] overflow-hidden rounded-sm"
                   style={{ transitionDelay: `${index * 0.1}s` }}
-                  data-group
                 >
                   <Image
                     src={collection.src}
                     alt={collection.title}
                     fill
-                    className="object-cover transition-transform duration-700 hover:scale-105"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-8">
-                    <p className="text-luxury-caption text-luxury-white/70 mb-2">
+                  <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/70 via-luxury-black/10 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                    <p className="text-luxury-caption text-luxury-white/75 mb-2">
                       {collection.subtitle}
                     </p>
-                    <h3 className="font-serif text-3xl text-luxury-white">
+                    <h3 className="font-serif text-2xl sm:text-3xl text-luxury-white">
                       {collection.title}
                     </h3>
                   </div>
@@ -183,7 +168,7 @@ export default function LuxuryHome() {
         {/* New Arrivals */}
         <section className="section-luxury">
           <div className="container-luxury">
-            <div ref={addToRefs} className="reveal flex flex-col md:flex-row md:items-end md:justify-between mb-16">
+            <div ref={addToRefs} className="reveal reveal-on-scroll flex flex-col md:flex-row md:items-end md:justify-between mb-10 md:mb-16 gap-4">
               <div>
                 <p className="text-luxury-caption text-luxury-taupe mb-4">Just In</p>
                 <h2 className="text-luxury-subheading text-luxury-black">
@@ -198,39 +183,41 @@ export default function LuxuryHome() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
               {products.map((product, index) => (
                 <div 
                   key={product.id}
                   ref={addToRefs}
-                  className="reveal group"
+                  className="reveal reveal-on-scroll group"
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
                   <Link href={`/product/${product.id}`} className="block group">
-                    <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-luxury-cream">
+                    <div className="relative aspect-[3/4] mb-3 md:mb-4 overflow-hidden bg-luxury-cream">
                       <Image
                         src={product.image}
                         alt={product.name}
                         fill
                         className="object-cover transition-opacity duration-500 group-hover:opacity-0"
+                        sizes="(max-width: 640px) 50vw, 25vw"
                       />
                       <Image
                         src={product.hoverImage}
-                        alt={product.name}
+                        alt=""
                         fill
                         className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        sizes="(max-width: 640px) 50vw, 25vw"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                        <button className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors">
-                          Quick View
-                        </button>
+                      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100 transition-all duration-500">
+                        <span className="block w-full py-2.5 sm:py-3 bg-luxury-black text-luxury-white text-[10px] sm:text-xs uppercase tracking-[0.12em] text-center">
+                          View product
+                        </span>
                       </div>
                     </div>
-                    <h3 className="font-serif text-lg text-luxury-black mb-1">
+                    <h3 className="font-serif text-base sm:text-lg text-luxury-black mb-1 line-clamp-2">
                       {product.name}
                     </h3>
                     <p className="text-sm text-luxury-taupe">
-                      ${product.price}
+                      {formatPKR(product.price)}
                     </p>
                   </Link>
                 </div>
@@ -240,30 +227,32 @@ export default function LuxuryHome() {
         </section>
 
         {/* Editorial Banner */}
-        <section className="relative h-[80vh] min-h-[600px] flex items-center">
+        <section className="relative min-h-[70vh] sm:min-h-[80vh] flex items-center py-16 sm:py-0">
           <div className="absolute inset-0">
             <Image
-              src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=80"
-              alt="Editorial"
+              src={editorialBannerSrc}
+              alt="Merry Berry atelier and craftsmanship"
               fill
-              className="object-cover"
+              className="object-cover object-center"
+              sizes="100vw"
+              priority
             />
-            <div className="absolute inset-0 bg-luxury-black/30" />
+            <div className="absolute inset-0 bg-luxury-black/40 md:bg-luxury-black/35" />
           </div>
-          <div className="container-luxury relative z-10">
-            <div ref={addToRefs} className="reveal max-w-2xl mx-auto text-center">
-              <p className="text-luxury-caption text-luxury-white/70 mb-6">
-                The Art of Dressing
+          <div className="container-luxury relative z-10 w-full">
+            <div ref={addToRefs} className="reveal reveal-on-scroll max-w-2xl mx-auto text-center px-2">
+              <p className="text-luxury-caption text-luxury-white/80 mb-4 sm:mb-6">
+                The art of dressing
               </p>
-              <h2 className="font-serif text-5xl md:text-7xl text-luxury-white mb-8 leading-tight">
+              <h2 className="font-serif text-4xl sm:text-5xl md:text-7xl text-luxury-white mb-6 sm:mb-8 leading-tight">
                 Timeless<br />
-                <span className="italic font-light">Sophistication</span>
+                <span className="italic font-light">sophistication</span>
               </h2>
-              <p className="text-luxury-white/80 text-lg mb-10 max-w-lg mx-auto">
-                Each piece is thoughtfully designed to transcend seasons, offering enduring style for the modern wardrobe.
+              <p className="text-luxury-white/90 text-base sm:text-lg mb-8 sm:mb-10 max-w-lg mx-auto leading-relaxed">
+                Garments made to carry you through seasons and settings—with fabrics, cuts, and finishes chosen for longevity, not trends alone.
               </p>
-              <Link href="/about" className="btn-luxury-outline border-luxury-white text-luxury-white hover:text-luxury-black">
-                <span>Our Story</span>
+              <Link href="/about" className="btn-luxury-outline border-luxury-white text-luxury-white hover:text-luxury-black inline-flex">
+                <span>Our story</span>
               </Link>
             </div>
           </div>
@@ -274,14 +263,18 @@ export default function LuxuryHome() {
           <div className="container-luxury">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {[
-                { icon: Truck, title: 'Complimentary Shipping', desc: 'On all orders over $200 worldwide' },
+                {
+                  icon: Truck,
+                  title: 'Complimentary Shipping',
+                  desc: `On Pakistan orders over ${formatPKR(FREE_SHIPPING_MIN_PKR)}`,
+                },
                 { icon: RefreshCw, title: 'Easy Returns', desc: '30-day return policy for peace of mind' },
                 { icon: Shield, title: 'Secure Payment', desc: 'Your data is protected with us' },
               ].map((feature, index) => (
                 <div 
                   key={index}
                   ref={addToRefs}
-                  className="reveal text-center"
+                  className="reveal reveal-on-scroll text-center px-2"
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
                   <feature.icon size={32} className="mx-auto mb-6 text-luxury-gold" strokeWidth={1} />
@@ -300,21 +293,23 @@ export default function LuxuryHome() {
         {/* Newsletter */}
         <section className="section-luxury bg-luxury-cream">
           <div className="container-luxury">
-            <div ref={addToRefs} className="reveal max-w-2xl mx-auto text-center">
-              <p className="text-luxury-caption text-luxury-taupe mb-4">Stay Connected</p>
+            <div ref={addToRefs} className="reveal reveal-on-scroll max-w-2xl mx-auto text-center px-2">
+              <p className="text-luxury-caption text-luxury-taupe mb-4">Stay connected</p>
               <h2 className="text-luxury-subheading text-luxury-black mb-6">
-                Join Our World
+                Join our world
               </h2>
               <p className="text-luxury-body text-luxury-taupe mb-10">
-                Subscribe to receive exclusive offers, early access to new collections, and styling inspiration.
+                Be first to hear about private sales, new drops, and studio notes from Merry Berry—unsubscribe anytime.
               </p>
-              <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <form className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
                 <input
                   type="email"
+                  name="email"
                   placeholder="Your email address"
-                  className="flex-1 px-6 py-4 bg-luxury-white border border-luxury-light-gray/20 text-luxury-black placeholder:text-luxury-taupe focus:outline-none focus:border-luxury-gold transition-colors"
+                  autoComplete="email"
+                  className="flex-1 min-h-[52px] px-5 sm:px-6 py-3 sm:py-4 bg-luxury-white border border-luxury-light-gray/20 text-luxury-black placeholder:text-luxury-taupe focus:outline-none focus:border-luxury-gold transition-colors text-base"
                 />
-                <button type="submit" className="btn-luxury whitespace-nowrap">
+                <button type="submit" className="btn-luxury whitespace-nowrap min-h-[52px] justify-center">
                   <span>Subscribe</span>
                 </button>
               </form>
@@ -323,66 +318,93 @@ export default function LuxuryHome() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-luxury-black text-luxury-white pt-20 pb-8">
+        <footer className="bg-luxury-black text-luxury-white pt-16 sm:pt-20 pb-8">
           <div className="container-luxury">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-              <div className="md:col-span-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-12 md:mb-16">
+              <div className="sm:col-span-2 lg:col-span-1">
                 <h2 className="font-serif text-2xl tracking-[0.15em] mb-6">MERRY BERRY</h2>
-                <p className="text-sm text-luxury-white/60 leading-relaxed">
-                  Crafting timeless elegance since 2016. Each piece tells a story of meticulous craftsmanship and enduring style.
+                <p className="text-sm text-luxury-white/60 leading-relaxed max-w-sm">
+                  Independent luxury fashion since 2016—thoughtful design, responsible partners, and pieces meant to stay in your wardrobe for years.
                 </p>
               </div>
               
               <div>
                 <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Shop</h3>
                 <ul className="space-y-3">
-                  {['New Arrivals', 'Women', 'Men', 'Accessories', 'Sale'].map((item) => (
-                    <li key={item}>
-                      <Link href="/shop" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
-                        {item}
-                      </Link>
-                    </li>
-                  ))}
+                  <li>
+                    <Link href="/shop?sort=new" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
+                      New arrivals
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/shop" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
+                      All products
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/collections" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
+                      Collections
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/cart" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
+                      Cart
+                    </Link>
+                  </li>
                 </ul>
               </div>
               
               <div>
                 <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Help</h3>
                 <ul className="space-y-3">
-                  {['Contact Us', 'Shipping Info', 'Returns', 'Size Guide', 'FAQ'].map((item) => (
-                    <li key={item}>
-                      <Link href="#" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
-                        {item}
-                      </Link>
-                    </li>
-                  ))}
+                  <li>
+                    <Link href={`mailto:${SITE.email}`} className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
+                      Contact us
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/about" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
+                      Shipping &amp; returns
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/about" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
+                      Size guide &amp; care
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/account" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
+                      Account
+                    </Link>
+                  </li>
                 </ul>
               </div>
               
               <div>
                 <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Contact</h3>
                 <ul className="space-y-3 text-sm text-luxury-white/60">
-                  <li>hello@merryberry.com</li>
-                  <li>+1 (800) 123-4567</li>
-                  <li>123 Fashion Avenue<br />New York, NY 10001</li>
+                  <li>
+                    <a href={`mailto:${SITE.email}`} className="hover:text-luxury-gold transition-colors">{SITE.email}</a>
+                  </li>
+                  <li>
+                    <a href={`tel:${SITE.phoneTel}`} className="hover:text-luxury-gold transition-colors">{SITE.phoneDisplay}</a>
+                  </li>
+                  <li>Pakistan</li>
                 </ul>
               </div>
             </div>
             
-            <div className="pt-8 border-t border-luxury-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="pt-8 border-t border-luxury-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
               <p className="text-xs text-luxury-white/40">
                 © 2026 Merry Berry. All rights reserved.
               </p>
-              <div className="flex gap-6">
-                {['Instagram', 'Facebook', 'Pinterest'].map((social) => (
-                  <Link 
-                    key={social}
-                    href="#"
-                    className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors"
-                  >
-                    {social}
-                  </Link>
-                ))}
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+                <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors">
+                  Instagram
+                </a>
+                <a href={SITE.facebook} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors">
+                  Facebook
+                </a>
               </div>
             </div>
           </div>

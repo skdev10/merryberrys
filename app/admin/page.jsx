@@ -11,21 +11,22 @@ import {
     Calendar
 } from "lucide-react"
 import Link from "next/link"
+import { formatPKR } from "@/lib/currency"
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
         products: 370,
         orders: 24,
         customers: 156,
-        revenue: 12580,
+        revenue: 1258000,
         growth: 12.5
     })
     const [recentOrders, setRecentOrders] = useState([
-        { id: '#ORD-001', customer: 'John Doe', product: 'Premium T-Shirt', amount: 89.99, status: 'Completed', date: '2026-04-11' },
-        { id: '#ORD-002', customer: 'Jane Smith', product: 'Winter Jacket', amount: 199.99, status: 'Processing', date: '2026-04-10' },
-        { id: '#ORD-003', customer: 'Mike Johnson', product: 'Cargo Pants', amount: 79.99, status: 'Pending', date: '2026-04-10' },
-        { id: '#ORD-004', customer: 'Sarah Williams', product: 'Hoodie', amount: 129.99, status: 'Completed', date: '2026-04-09' },
-        { id: '#ORD-005', customer: 'David Brown', product: 'Polo Shirt', amount: 59.99, status: 'Shipped', date: '2026-04-09' },
+        { id: '#ORD-001', customer: 'John Doe', product: 'Premium T-Shirt', amount: 8999, status: 'Completed', date: '2026-04-11' },
+        { id: '#ORD-002', customer: 'Jane Smith', product: 'Winter Jacket', amount: 18999, status: 'Processing', date: '2026-04-10' },
+        { id: '#ORD-003', customer: 'Mike Johnson', product: 'Cargo Pants', amount: 7999, status: 'Pending', date: '2026-04-10' },
+        { id: '#ORD-004', customer: 'Sarah Williams', product: 'Hoodie', amount: 12999, status: 'Completed', date: '2026-04-09' },
+        { id: '#ORD-005', customer: 'David Brown', product: 'Polo Shirt', amount: 5999, status: 'Shipped', date: '2026-04-09' },
     ])
 
     const statCards = [
@@ -55,7 +56,7 @@ export default function AdminDashboard() {
         },
         { 
             title: 'Revenue', 
-            value: `$${stats.revenue.toLocaleString()}`, 
+            value: formatPKR(stats.revenue), 
             icon: DollarSign, 
             change: '+15%',
             trend: 'up',
@@ -82,7 +83,7 @@ export default function AdminDashboard() {
                     <p className="text-zinc-500">Welcome back! Here's what's happening with your store.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="text-zinc-500 text-sm flex items-center gap-2">
+                    <span className="text-zinc-500 text-sm flex items-center gap-2" suppressHydrationWarning>
                         <Calendar size={16} />
                         {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
@@ -136,7 +137,7 @@ export default function AdminDashboard() {
                                         <td className="p-4 text-white font-medium">{order.id}</td>
                                         <td className="p-4 text-zinc-400">{order.customer}</td>
                                         <td className="p-4 text-zinc-400">{order.product}</td>
-                                        <td className="p-4 text-white font-medium">${order.amount}</td>
+                                        <td className="p-4 text-white font-medium">{formatPKR(order.amount)}</td>
                                         <td className="p-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                                                 {order.status}
@@ -176,16 +177,16 @@ export default function AdminDashboard() {
                         <h2 className="text-xl font-serif text-white mb-4">Top Products</h2>
                         <div className="space-y-4">
                             {[
-                                { name: 'Premium Hoodie', sales: 45, revenue: 5845 },
-                                { name: 'Cargo Pants', sales: 38, revenue: 3039 },
-                                { name: 'Winter Jacket', sales: 32, revenue: 6396 },
+                                { name: 'Premium Hoodie', sales: 45, revenue: 584500 },
+                                { name: 'Cargo Pants', sales: 38, revenue: 303900 },
+                                { name: 'Winter Jacket', sales: 32, revenue: 639600 },
                             ].map((product, index) => (
                                 <div key={index} className="flex items-center justify-between">
                                     <div>
                                         <p className="text-white font-medium">{product.name}</p>
                                         <p className="text-zinc-500 text-sm">{product.sales} sales</p>
                                     </div>
-                                    <p className="text-gold-400 font-medium">${product.revenue}</p>
+                                    <p className="text-gold-400 font-medium">{formatPKR(product.revenue)}</p>
                                 </div>
                             ))}
                         </div>

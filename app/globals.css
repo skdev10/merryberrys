@@ -220,6 +220,27 @@
   100% { background-position: 200% 0; }
 }
 
+@keyframes heroCopyIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-slide-copy {
+  animation: heroCopyIn 0.85s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide-copy {
+    animation: none;
+  }
+}
+
 /* Animation Classes */
 .animate-fade-in {
   animation: fadeIn 1s ease forwards;
@@ -245,16 +266,23 @@
   animation: float 6s ease-in-out infinite;
 }
 
-/* Scroll Reveal */
+/* Scroll reveal — visible by default so content is never stuck hidden if JS fails */
 .reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s ease;
-}
-
-.reveal.active {
   opacity: 1;
   transform: translateY(0);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  .reveal.reveal-on-scroll.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Custom Scrollbar */

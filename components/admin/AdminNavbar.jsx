@@ -8,10 +8,10 @@ const AdminNavbar = ({ adminUser }) => {
     const router = useRouter()
     const [showMobileMenu, setShowMobileMenu] = useState(false)
 
-    const handleLogout = () => {
-        localStorage.removeItem('adminToken')
-        localStorage.removeItem('adminUser')
+    const handleLogout = async () => {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
         router.push('/admin/login')
+        router.refresh()
     }
 
     return (

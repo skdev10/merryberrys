@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { formatPKR } from "@/lib/currency"
 
 export default function ProductsPage() {
     const [products, setProducts] = useState([])
@@ -169,7 +170,7 @@ export default function ProductsPage() {
                                                 </span>
                                             </td>
                                             <td className="p-4">
-                                                <p className="text-white font-medium">${product.price}</p>
+                                                <p className="text-white font-medium">{formatPKR(product.price)}</p>
                                             </td>
                                             <td className="p-4">
                                                 <p className="text-zinc-400">{product.inStock ? 'In Stock' : 'Out of Stock'}</p>

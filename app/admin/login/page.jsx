@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock, Mail, ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { adminLoginBackdropSrc } from '@/lib/brandAssets';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -18,18 +19,23 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('adminToken', data.token);
-        localStorage.setItem('adminUser', JSON.stringify(data.user));
+        if (data.user?.role !== 'admin') {
+          setError('This account is not an administrator');
+          await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+          return;
+        }
         router.push('/admin');
+        router.refresh();
       } else {
         setError(data.message || 'Invalid credentials');
       }
@@ -46,7 +52,11 @@ export default function AdminLogin() {
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-berry-500/20 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1441986300917-64674bad6001?w=1600&q=80')] bg-cover bg-center opacity-5"></div>
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-[0.14]"
+          style={{ backgroundImage: `url('${adminLoginBackdropSrc}')` }}
+          aria-hidden
+        />
       </div>
 
       <div className="relative z-10 w-full max-w-md px-6">
@@ -142,7 +152,7 @@ export default function AdminLogin() {
 
           <div className="mt-6 text-center">
             <p className="text-zinc-500 text-sm">
-              Default: <span className="text-zinc-400">admin@merryberry.com</span> / <span className="text-zinc-400">password123</span>
+              After seed: <span className="text-zinc-400">admin@merryberry.com</span> / <span className="text-zinc-400">admin123</span>
             </p>
           </div>
         </div>

@@ -4,21 +4,25 @@ import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
 import { X, ShoppingCart } from 'lucide-react';
+import { formatPKR } from '@/lib/currency';
+
+const px = (id) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=800`;
 
 export default function WishlistPage() {
   const [items, setItems] = useState([
     {
       id: 3,
       name: 'Merry Berry Signature Tracksuit',
-      price: 199.99,
-      image: 'https://wpecomus.com/fashion/wp-content/uploads/2023/10/fashion-product-3.jpg',
+      price: 18999,
+      image: px('5701645'),
       inStock: true
     },
     {
       id: 4,
       name: 'Vintage Wash Denim Jacket',
-      price: 149.99,
-      image: 'https://wpecomus.com/fashion/wp-content/uploads/2023/10/fashion-product-4.jpg',
+      price: 14999,
+      image: px('1926764'),
       inStock: true
     }
   ]);
@@ -54,7 +58,7 @@ export default function WishlistPage() {
                   </Link>
                   <div className="p-5">
                     <Link href={`/product/${item.id}`} className="block font-medium text-lg mb-2 hover:text-berry-400 truncate">{item.name}</Link>
-                    <p className="text-gold-400 font-serif mb-4">${item.price}</p>
+                    <p className="text-gold-400 font-serif mb-4">{formatPKR(item.price)}</p>
                     <button className="w-full bg-transparent border border-berry-500 hover:bg-berry-600 hover:text-white text-berry-500 py-2 rounded flex items-center justify-center transition-colors">
                       <ShoppingCart size={16} className="mr-2" /> Quick Add
                     </button>

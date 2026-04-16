@@ -1,8 +1,11 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import { Upload, ShoppingCart, RefreshCw } from 'lucide-react';
+import { CUSTOM_PRINT_SAMPLE_SRC } from '@/lib/brandAssets';
+import { formatPKR } from '@/lib/currency';
 
 export default function CustomPrint() {
   const [garment, setGarment] = useState('tshirt');
@@ -14,7 +17,7 @@ export default function CustomPrint() {
   const handleFileUpload = (e) => {
     setIsUploading(true);
     setTimeout(() => {
-      setUploadedDesign('https://wpecomus.com/fashion/wp-content/uploads/2023/10/fashion-product-1.jpg'); // dummy uploaded image logic
+      setUploadedDesign(CUSTOM_PRINT_SAMPLE_SRC);
       setIsUploading(false);
     }, 1000);
   };
@@ -41,8 +44,8 @@ export default function CustomPrint() {
                 </div>
                 {/* Design Overlay */}
                 {uploadedDesign && (
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-dashed border-white/30 overflow-hidden bg-black/20 flex items-center justify-center">
-                    <span className="text-xs text-white">Your Design</span>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 border-2 border-dashed border-white/40 overflow-hidden bg-black/30 relative rounded-sm">
+                    <Image src={uploadedDesign} alt="Your uploaded design preview" fill className="object-contain p-1" sizes="144px" />
                   </div>
                 )}
               </div>
@@ -91,7 +94,7 @@ export default function CustomPrint() {
                 <div className="pt-6 border-t border-white/10 flex justify-between items-center">
                   <div>
                     <p className="text-zinc-400 text-sm">Total Custom Order</p>
-                    <p className="text-gold-400 font-serif text-3xl font-semibold">$89.99</p>
+                    <p className="text-gold-400 font-serif text-3xl font-semibold">{formatPKR(8999)}</p>
                   </div>
                   <button className="bg-berry-600 hover:bg-berry-500 text-white px-8 py-4 rounded font-medium flex items-center transition-colors shadow-[0_0_15px_rgba(218,44,119,0.3)] disabled:opacity-50" disabled={!uploadedDesign}>
                     <ShoppingCart size={18} className="mr-2" /> Add to Cart

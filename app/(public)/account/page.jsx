@@ -1,99 +1,132 @@
 'use client';
-import { useState } from 'react';
-import Navbar from '../../../components/Navbar';
-import Footer from '../../../components/Footer';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import LuxuryNavbar from '../../../components/LuxuryNavbar';
+import { useRouter } from 'next/navigation';
+import { formatPKR } from '@/lib/currency';
 
 export default function AccountPage() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoggedIn(true);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const meRes = await fetch('/api/auth/me', { credentials: 'include' });
+        const meData = await meRes.json();
+        if (!meData.user) {
+          router.replace('/login?redirect=/account');
+          return;
+        }
+        if (cancelled) return;
+        setUser(meData.user);
+
+        const ordRes = await fetch('/api/orders', { credentials: 'include' });
+        if (ordRes.ok) {
+          const ordData = await ordRes.json();
+          setOrders(ordData.orders || []);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  const logout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    router.push('/');
+    router.refresh();
   };
 
-  if (isLoggedIn) {
+  if (loading) {
     return (
       <>
-        <Navbar />
-        <main className="min-h-screen bg-zinc-950 text-white pt-10 pb-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="font-serif text-4xl mb-12 border-b border-white/10 pb-6">My Account</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div className="col-span-1 space-y-2">
-                <button className="w-full text-left bg-berry-900/30 text-white px-4 py-3 rounded border-l-2 border-berry-500">Dashboard</button>
-                <button className="w-full text-left text-zinc-400 hover:text-white px-4 py-3 rounded hover:bg-zinc-900">Orders</button>
-                <button className="w-full text-left text-zinc-400 hover:text-white px-4 py-3 rounded hover:bg-zinc-900">Addresses</button>
-                <button className="w-full text-left text-zinc-400 hover:text-white px-4 py-3 rounded hover:bg-zinc-900 mt-4 text-red-400 hover:text-red-300" onClick={() => setIsLoggedIn(false)}>Logout</button>
-              </div>
-              
-              <div className="col-span-1 md:col-span-3">
-                <div className="bg-zinc-900 rounded-xl p-8 border border-white/5">
-                  <h2 className="text-xl font-serif mb-6">Hello, Premium Member</h2>
-                  <p className="text-zinc-400 mb-8">From your account dashboard you can view your recent orders, manage your shipping and billing addresses, and edit your password and account details.</p>
-                  
-                  <h3 className="text-lg font-serif mb-4 mt-10">Recent Orders</h3>
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-zinc-700 text-zinc-500 text-sm">
-                        <th className="pb-3 font-normal">Order</th>
-                        <th className="pb-3 font-normal">Date</th>
-                        <th className="pb-3 font-normal">Status</th>
-                        <th className="pb-3 font-normal">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-zinc-800">
-                        <td className="py-4">#MB-20491</td>
-                        <td className="py-4 text-sm text-zinc-400">Oct 14, 2023</td>
-                        <td className="py-4"><span className="bg-zinc-800 text-white text-xs px-2 py-1 rounded">Processing</span></td>
-                        <td className="py-4 font-serif text-gold-400">$309.97</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-        <Footer />
+        <LuxuryNavbar />
+        <div className="min-h-screen bg-luxury-white pt-32 flex justify-center text-luxury-taupe">Loading…</div>
       </>
     );
   }
 
+  if (!user) return null;
+
   return (
     <>
-      <Navbar />
-      <main className="min-h-screen bg-zinc-950 text-white flex items-center justify-center py-20">
-        <div className="max-w-md w-full px-4 text-center">
-          
-          <h1 className="font-serif text-4xl mb-2">{isLogin ? 'Login' : 'Create Account'}</h1>
-          <p className="text-zinc-400 text-sm mb-8">
-            {isLogin ? 'Welcome back to Merry Berry. Enter your details to continue.' : 'Join the exclusive club of premium fashion.'}
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <input type="text" placeholder="Full Name" required className="w-full bg-zinc-900 border border-zinc-700 rounded p-4 text-white focus:outline-none focus:border-berry-500" />
-            )}
-            <input type="email" placeholder="Email Address" required className="w-full bg-zinc-900 border border-zinc-700 rounded p-4 text-white focus:outline-none focus:border-berry-500" />
-            <input type="password" placeholder="Password" required className="w-full bg-zinc-900 border border-zinc-700 rounded p-4 text-white focus:outline-none focus:border-berry-500" />
-            
-            <button type="submit" className="w-full bg-berry-600 hover:bg-berry-500 text-white rounded py-4 font-medium transition shadow-[0_0_15px_rgba(218,44,119,0.3)]">
-              {isLogin ? 'Sign In' : 'Register'}
-            </button>
-          </form>
-
-          <div className="mt-8">
-            <button onClick={() => setIsLogin(!isLogin)} className="text-zinc-500 hover:text-berry-400 transition underline underline-offset-4 text-sm">
-              {isLogin ? 'New to Merry Berry? Create an account' : 'Already have an account? Login'}
+      <LuxuryNavbar />
+      <main className="min-h-screen bg-luxury-white pt-28 pb-20">
+        <div className="container-luxury max-w-5xl">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 border-b border-luxury-light-gray/20 pb-8">
+            <div>
+              <p className="text-luxury-caption text-luxury-taupe mb-2">Account</p>
+              <h1 className="font-serif text-4xl text-luxury-black">Hello, {user.name?.split(' ')[0]}</h1>
+              <p className="text-luxury-taupe text-sm mt-2">{user.email}</p>
+            </div>
+            <button
+              type="button"
+              onClick={logout}
+              className="btn-luxury-outline self-start md:self-auto"
+            >
+              <span>Log out</span>
             </button>
           </div>
 
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-1 space-y-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-luxury-taupe">Quick links</p>
+              <Link href="/shop" className="block text-luxury-black hover:text-luxury-gold">
+                Shop
+              </Link>
+              <Link href="/orders" className="block text-luxury-black hover:text-luxury-gold">
+                Order history
+              </Link>
+              <Link href="/cart" className="block text-luxury-black hover:text-luxury-gold">
+                Cart
+              </Link>
+            </div>
+
+            <div className="lg:col-span-2">
+              <h2 className="font-serif text-2xl text-luxury-black mb-6">Recent orders</h2>
+              {orders.length === 0 ? (
+                <p className="text-luxury-taupe">No orders yet. <Link href="/shop" className="underline">Start shopping</Link>.</p>
+              ) : (
+                <div className="space-y-4">
+                  {orders.map((o) => (
+                    <div
+                      key={o.id}
+                      className="bg-luxury-cream border border-luxury-light-gray/20 p-6 flex flex-wrap justify-between gap-4"
+                    >
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.15em] text-luxury-taupe">Order</p>
+                        <p className="font-mono text-luxury-black">{o.id.slice(0, 8).toUpperCase()}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.15em] text-luxury-taupe">Date</p>
+                        <p className="text-luxury-black" suppressHydrationWarning>
+                          {new Date(o.createdAt).toLocaleDateString('en-GB')}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.15em] text-luxury-taupe">Status</p>
+                        <p className="text-luxury-black">{o.status}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.15em] text-luxury-taupe">Total</p>
+                        <p className="font-serif text-lg text-luxury-black">{formatPKR(o.total)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

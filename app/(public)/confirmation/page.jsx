@@ -1,57 +1,85 @@
 'use client';
-import Navbar from '../../../components/Navbar';
-import Footer from '../../../components/Footer';
-import Link from 'next/link';
-import { CheckCircle } from 'lucide-react';
 
-export default function ConfirmationPage() {
-  const orderNumber = `MB-${Math.floor(100000 + Math.random() * 900000)}`;
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import LuxuryNavbar from '../../../components/LuxuryNavbar';
+import { CheckCircle } from 'lucide-react';
+import { formatPKR } from '@/lib/currency';
+
+function ConfirmationInner() {
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get('orderId') || '';
+  const total = searchParams.get('total');
+
+  /** Random fallback must run only on the client — server vs client Math.random breaks hydration. */
+  const [fallbackRef, setFallbackRef] = useState('');
+  useEffect(() => {
+    if (!orderId) {
+      setFallbackRef(`MB-${Math.floor(100000 + Math.random() * 900000)}`);
+    }
+  }, [orderId]);
+
+  const orderLabel = orderId
+    ? orderId.slice(0, 8).toUpperCase()
+    : fallbackRef || '—';
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-zinc-950 text-white flex items-center justify-center pt-10 pb-20">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          
-          <div className="flex justify-center mb-6">
-            <CheckCircle size={80} className="text-berry-500" />
-          </div>
-          
-          <h1 className="font-serif text-5xl mb-4 text-gold-400">Order Confirmed!</h1>
-          <p className="text-zinc-400 text-lg mb-8">Thank you for shopping with Merry Berry. Your premium fashion is on its way.</p>
-          
-          <div className="bg-zinc-900 border border-white/10 rounded-xl p-8 mb-10 text-left">
-            <h2 className="text-lg font-medium mb-4">Order Details</h2>
-            <div className="flex justify-between border-b border-zinc-800 pb-4 mb-4">
-              <span className="text-zinc-400">Order Number</span>
-              <span className="font-mono text-white">{orderNumber}</span>
-            </div>
-            <div className="flex justify-between border-b border-zinc-800 pb-4 mb-4">
-              <span className="text-zinc-400">Date</span>
-              <span className="text-white">{new Date().toLocaleDateString()}</span>
-            </div>
-            <div className="flex justify-between border-b border-zinc-800 pb-4 mb-4">
-              <span className="text-zinc-400">Total Amount</span>
-              <span className="text-white font-serif text-xl">$309.97</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-zinc-400">Payment Method</span>
-              <span className="text-white">Credit Card ending in 4242</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/shop" className="px-8 py-4 bg-berry-600 hover:bg-berry-500 rounded font-medium transition shadow-lg inline-block">
-              Continue Shopping
-            </Link>
-            <Link href="/account" className="px-8 py-4 bg-zinc-800 hover:bg-zinc-700 rounded font-medium transition shadow-lg inline-block text-white">
-              View Order in Account
-            </Link>
-          </div>
-
+    <main className="min-h-screen bg-luxury-white flex items-center justify-center pt-28 pb-20 px-4">
+      <div className="max-w-2xl mx-auto text-center">
+        <div className="flex justify-center mb-6">
+          <CheckCircle size={80} className="text-luxury-gold" strokeWidth={1} />
         </div>
-      </main>
-      <Footer />
+
+        <h1 className="font-serif text-4xl md:text-5xl mb-4 text-luxury-black">Order Confirmed</h1>
+        <p className="text-luxury-taupe text-lg mb-10">
+          Thank you for shopping with Merry Berry. You will receive a confirmation email shortly.
+        </p>
+
+        <div className="bg-luxury-cream border border-luxury-light-gray/20 p-8 mb-10 text-left">
+          <h2 className="font-serif text-xl text-luxury-black mb-6">Order details</h2>
+          <div className="flex justify-between border-b border-luxury-light-gray/20 pb-4 mb-4 text-sm">
+            <span className="text-luxury-taupe">Order reference</span>
+            <span className="font-mono text-luxury-black">{orderLabel}</span>
+          </div>
+          <div className="flex justify-between border-b border-luxury-light-gray/20 pb-4 mb-4 text-sm">
+            <span className="text-luxury-taupe">Date</span>
+            <span className="text-luxury-black" suppressHydrationWarning>
+              {new Date().toLocaleDateString('en-GB')}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-luxury-taupe">Total</span>
+            <span className="font-serif text-xl text-luxury-black">
+              {total != null && total !== '' ? formatPKR(total) : '—'}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link href="/shop" className="btn-luxury text-center">
+            <span>Continue shopping</span>
+          </Link>
+          <Link href="/account" className="btn-luxury-outline text-center">
+            <span>Account</span>
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+export default function ConfirmationPage() {
+  return (
+    <>
+      <LuxuryNavbar />
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-luxury-white pt-32 flex justify-center text-luxury-taupe">Loading…</div>
+        }
+      >
+        <ConfirmationInner />
+      </Suspense>
     </>
   );
 }

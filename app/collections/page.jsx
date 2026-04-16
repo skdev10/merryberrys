@@ -1,45 +1,118 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import LuxuryNavbar from '../../components/LuxuryNavbar';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { SITE } from '@/lib/site';
+import { COLLECTION_CARD_IMAGES } from '@/lib/brandAssets';
+
+const px2000 = (id) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=2000`;
+
+const bannerSlides = [
+  {
+    src: px2000('1040945'),
+    title: 'Seasonal Stories',
+    subtitle: 'Editorial picks from our design studio',
+  },
+  {
+    src: px2000('1926764'),
+    title: 'Runway to Reality',
+    subtitle: 'Luxury you can live in every day',
+  },
+  {
+    src: px2000('1462637'),
+    title: 'Texture & Light',
+    subtitle: 'Fabrics chosen for drape, hand-feel, and longevity',
+  },
+];
 
 const collections = [
   {
     id: 1,
     name: 'Summer 2026',
     description: 'Light, airy pieces for the warm season',
-    image: 'https://innovecouture.vamtam.com/wp-content/uploads/2024/02/1034336401_1_1_1-683x1024.jpg',
+    image: COLLECTION_CARD_IMAGES[0],
     itemCount: 24,
   },
   {
     id: 2,
     name: 'Evening Edit',
     description: 'Elegant pieces for special occasions',
-    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80',
+    image: COLLECTION_CARD_IMAGES[1],
     itemCount: 18,
   },
   {
     id: 3,
     name: 'Essentials',
     description: 'Timeless staples for every wardrobe',
-    image: 'https://images.unsplash.com/photo-1496745911865-6eaf0df0dc4b?w=800&q=80',
+    image: COLLECTION_CARD_IMAGES[2],
     itemCount: 32,
   },
   {
     id: 4,
     name: 'Winter Collection',
     description: 'Cozy luxury for cold days',
-    image: 'https://images.unsplash.com/photo-1539533018447-63fcce268581?w=800&q=80',
+    image: COLLECTION_CARD_IMAGES[3],
     itemCount: 28,
   },
 ];
 
 export default function CollectionsPage() {
+  const [bannerIdx, setBannerIdx] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(
+      () => setBannerIdx((i) => (i + 1) % bannerSlides.length),
+      5500
+    );
+    return () => clearInterval(t);
+  }, []);
+
   return (
     <>
       <LuxuryNavbar />
       
       <main className="pt-32 pb-20 bg-luxury-white min-h-screen">
+        <section className="relative h-[42vh] min-h-[280px] max-h-[480px] w-full overflow-hidden mb-16">
+          {bannerSlides.map((b, i) => (
+            <div
+              key={b.src}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                i === bannerIdx ? 'opacity-100 z-0' : 'opacity-0 z-0 pointer-events-none'
+              }`}
+            >
+              <Image src={b.src} alt="" fill className="object-cover" sizes="100vw" priority={i === 0} />
+              <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/55 via-luxury-black/15 to-transparent" />
+            </div>
+          ))}
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-6">
+            <p className="text-luxury-caption text-luxury-white/80 mb-3">{bannerSlides[bannerIdx].subtitle}</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-luxury-white drop-shadow-sm">
+              {bannerSlides[bannerIdx].title}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              setBannerIdx((i) => (i - 1 + bannerSlides.length) % bannerSlides.length)
+            }
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-luxury-white/90 flex items-center justify-center hover:bg-white"
+            aria-label="Previous"
+          >
+            <ChevronLeft size={22} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setBannerIdx((i) => (i + 1) % bannerSlides.length)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-luxury-white/90 flex items-center justify-center hover:bg-white"
+            aria-label="Next"
+          >
+            <ChevronRight size={22} />
+          </button>
+        </section>
+
         {/* Header */}
         <div className="container-luxury mb-16">
           <div className="text-center">
@@ -141,9 +214,13 @@ export default function CollectionsPage() {
             <div>
               <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Contact</h3>
               <ul className="space-y-3 text-sm text-luxury-white/60">
-                <li>hello@merryberry.com</li>
-                <li>+1 (800) 123-4567</li>
-                <li>123 Fashion Avenue<br />New York, NY 10001</li>
+                <li>
+                  <a href={`mailto:${SITE.email}`} className="hover:text-luxury-gold transition-colors">{SITE.email}</a>
+                </li>
+                <li>
+                  <a href={`tel:${SITE.phoneTel}`} className="hover:text-luxury-gold transition-colors">{SITE.phoneDisplay}</a>
+                </li>
+                <li>Pakistan</li>
               </ul>
             </div>
           </div>
@@ -153,15 +230,22 @@ export default function CollectionsPage() {
               © 2026 Merry Berry. All rights reserved.
             </p>
             <div className="flex gap-6">
-              {['Instagram', 'Facebook', 'Pinterest'].map((social) => (
-                <Link 
-                  key={social}
-                  href="#"
-                  className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors"
-                >
-                  {social}
-                </Link>
-              ))}
+              <a
+                href={SITE.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors"
+              >
+                Instagram
+              </a>
+              <a
+                href={SITE.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors"
+              >
+                Facebook
+              </a>
             </div>
           </div>
         </div>
