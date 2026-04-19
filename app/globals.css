@@ -1,0 +1,439 @@
+@import "tailwindcss";
+
+@theme {
+  /* Luxury Fashion Color Palette */
+  --color-luxury-black: #0a0a0a;
+  --color-luxury-dark: #111111;
+  --color-luxury-charcoal: #1a1a1a;
+  --color-luxury-gray: #2a2a2a;
+  --color-luxury-light-gray: #3a3a3a;
+  --color-luxury-cream: #f5f5f0;
+  --color-luxury-white: #fafafa;
+  --color-luxury-off-white: #f0f0eb;
+  --color-luxury-taupe: #8b8680;
+  --color-luxury-gold: #c9a96e;
+  --color-luxury-gold-light: #d4b896;
+  
+  /* Typography */
+  --font-serif: 'Playfair Display', 'Times New Roman', serif;
+  --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-luxury-white text-luxury-black font-sans antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight;
+  }
+  
+  ::selection {
+    @apply bg-luxury-black text-luxury-white;
+  }
+}
+
+@layer utilities {
+  /* Luxury Text Styles */
+  .text-luxury-heading {
+    @apply font-serif text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight leading-none;
+  }
+  
+  .text-luxury-subheading {
+    @apply font-serif text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight;
+  }
+  
+  .text-luxury-body {
+    @apply font-sans text-sm md:text-base tracking-wide leading-relaxed;
+  }
+  
+  .text-luxury-caption {
+    @apply font-sans text-xs uppercase tracking-[0.2em] font-medium;
+  }
+  
+  /* Luxury Button Styles */
+  .btn-luxury {
+    @apply relative inline-flex items-center justify-center px-8 py-4 bg-luxury-black text-luxury-white font-sans text-xs uppercase tracking-[0.2em] font-medium overflow-hidden transition-all duration-500;
+  }
+  
+  .btn-luxury::before {
+    content: '';
+    @apply absolute inset-0 bg-luxury-gold transform -translate-x-full transition-transform duration-500;
+  }
+  
+  .btn-luxury:hover::before {
+    @apply translate-x-0;
+  }
+  
+  .btn-luxury span {
+    @apply relative z-10;
+  }
+  
+  .btn-luxury-outline {
+    @apply relative inline-flex items-center justify-center px-8 py-4 bg-transparent border border-luxury-black text-luxury-black font-sans text-xs uppercase tracking-[0.2em] font-medium overflow-hidden transition-all duration-500;
+  }
+  
+  .btn-luxury-outline::before {
+    content: '';
+    @apply absolute inset-0 bg-luxury-black transform -translate-x-full transition-transform duration-500;
+  }
+  
+  .btn-luxury-outline:hover::before {
+    @apply translate-x-0;
+  }
+  
+  .btn-luxury-outline:hover {
+    @apply text-luxury-white;
+  }
+  
+  .btn-luxury-outline span {
+    @apply relative z-10;
+  }
+  
+  /* Luxury Card Styles */
+  .card-luxury {
+    @apply bg-luxury-white border border-luxury-light-gray/20 overflow-hidden;
+  }
+  
+  /* Image Hover Effects */
+  .img-luxury-hover {
+    @apply overflow-hidden;
+  }
+  
+  .img-luxury-hover img {
+    @apply transition-transform duration-700 ease-out;
+  }
+  
+  .img-luxury-hover:hover img {
+    @apply scale-105;
+  }
+  
+  /* Underline Animation */
+  .underline-luxury {
+    @apply relative;
+  }
+  
+  .underline-luxury::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-px bg-luxury-gold transition-all duration-500;
+  }
+  
+  .underline-luxury:hover::after {
+    @apply w-full;
+  }
+  
+  /* Glass Effect */
+  .glass-luxury {
+    @apply bg-luxury-white/80 backdrop-blur-xl border-b border-luxury-light-gray/10;
+  }
+  
+  /* Section Spacing */
+  .section-luxury {
+    @apply py-20 md:py-32 lg:py-40;
+  }
+  
+  /* Container */
+  .container-luxury {
+    @apply max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20;
+  }
+  
+  /* Grid Patterns */
+  .grid-luxury {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8;
+  }
+  
+  /* Fade In Animation */
+  .fade-in {
+    @apply opacity-0 translate-y-8;
+    animation: fadeIn 1s ease forwards;
+  }
+  
+  .fade-in-delay-1 { animation-delay: 0.1s; }
+  .fade-in-delay-2 { animation-delay: 0.2s; }
+  .fade-in-delay-3 { animation-delay: 0.3s; }
+  .fade-in-delay-4 { animation-delay: 0.4s; }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+  animation: fadeIn 1s ease forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 1s ease forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 1s ease forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.8s ease forwards;
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Scroll Reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-luxury-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-luxury-taupe);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-luxury-black);
+}
+
+/* Product Card Hover */
+.product-card-luxury {
+  position: relative;
+}
+
+.product-card-luxury .product-image {
+  overflow: hidden;
+}
+
+.product-card-luxury .product-image img {
+  transition: transform 700ms ease-out;
+}
+
+.product-card-luxury:hover .product-image img {
+  transform: scale(1.05);
+}
+
+.product-card-luxury .product-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  transform: translateY(100%);
+  opacity: 0;
+  transition: all 500ms;
+}
+
+.product-card-luxury:hover .product-actions {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Mega Menu */
+.mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-luxury-white);
+  border-top: 1px solid rgba(58, 58, 58, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 300ms;
+}
+
+.mega-menu-trigger:hover .mega-menu {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Search Overlay */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.95);
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 500ms;
+}
+
+.search-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  background: var(--color-luxury-white);
+  z-index: 50;
+  transform: translateX(100%);
+  transition: transform 500ms;
+}
+
+.mobile-menu.active {
+  transform: translateX(0);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: rgba(58, 58, 58, 0.2);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Image Zoom */
+.image-zoom {
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.image-zoom img {
+  transition: transform 500ms;
+}
+
+.image-zoom:hover img {
+  transform: scale(1.5);
+}
+
+/* Hero carousel — editorial treatment */
+.hero-shell {
+  min-height: min(88vh, 900px);
+}
+
+.hero-vignette {
+  background: linear-gradient(
+    105deg,
+    rgba(10, 10, 10, 0.88) 0%,
+    rgba(10, 10, 10, 0.45) 42%,
+    rgba(10, 10, 10, 0.2) 100%
+  );
+}
+
+@media (max-width: 768px) {
+  .hero-vignette {
+    background: linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 0.2) 0%,
+      rgba(10, 10, 10, 0.75) 55%,
+      rgba(10, 10, 10, 0.92) 100%
+    );
+  }
+}
+
+.hero-bg-img {
+  transform: scale(1.02);
+}
+
+.hero-ken {
+  animation: hero-ken 14s ease-in-out infinite alternate;
+}
+
+@keyframes hero-ken {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.08) translate3d(-1.2%, -0.6%, 0);
+  }
+}
+
+@keyframes hero-text-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.hero-text-enter {
+  animation: hero-text-in 0.75s ease-out both;
+}

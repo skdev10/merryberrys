@@ -1,0 +1,136 @@
+// Existing user models extended with requested features
+generator client {
+    provider        = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        String   @id @default(cuid())
+    name      String
+    email     String   @unique
+    password  String
+    role      String   @default("user")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    orders            Order[]
+    cart              Cart[]
+    wishlist          Wishlist[]
+    customPrintOrders CustomPrintOrder[]
+}
+
+model Category {
+    id        String   @id @default(cuid())
+    name      String   @unique
+    slug      String   @unique
+    parent    String?  // Optional for grouping (e.g. "Men - Lower")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    products  Product[]
+}
+
+model Product {
+    id          String   @id @default(cuid())
+    name        String
+    slug        String   @unique
+    description String
+    price       Float
+    images      String   // Stored as JSON string of URLs
+    sizes       String   // JSON string of sizes like ['S', 'M', 'L']
+    colors      String   // JSON string of colors
+    categoryId  String
+    inStock     Boolean  @default(true)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    category    Category    @relation(fields: [categoryId], references: [id])
+    orderItems  OrderItem[]
+    cart        Cart[]
+    wishlist    Wishlist[]
+}
+
+model Order {
+    id            String   @id @default(cuid())
+    userId        String
+    total         Float
+    status        String   @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED
+    address       String   // JSON string of shipping address
+    paymentMethod String
+    isPaid        Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    user        User        @relation(fields: [userId], references: [id])
+    orderItems  OrderItem[]
+}
+
+model OrderItem {
+    id        String   @id @default(cuid())
+    orderId   String
+    productId String
+    quantity  Int
+    price     Float
+    size      String?
+    color     String?
+
+    order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Cart {
+    id        String   @id @default(cuid())
+    userId    String
+    productId String
+    quantity  Int
+    size      String?
+    color     String?
+
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Wishlist {
+    id        String   @id @default(cuid())
+    userId    String
+    productId String
+
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, productId])
+}
+
+model HeroSlide {
+    id        String   @id @default(cuid())
+    imageUrl  String
+    videoUrl  String?
+    title     String
+    subtitle  String?
+    ctaLabel  String
+    ctaHref   String
+    sortOrder Int      @default(0)
+    active    Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model CustomPrintOrder {
+    id           String   @id @default(cuid())
+    userId       String
+    garmentType  String   // e.g. T-Shirt, Hoodie
+    color        String
+    size         String
+    designImage  String   // URL to uploaded image
+    placement    String   // Front, Back, Both
+    quantity     Int
+    totalPrice   Float
+    status       String   @default("PENDING")
+    createdAt    DateTime @default(now())
+
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

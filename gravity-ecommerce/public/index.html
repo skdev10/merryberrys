@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gravity | Premium Ecommerce</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- GSAP for deep animation if heavily configured later, right now using CSS -->
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <a href="/" class="logo">GRAVITY</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="#collections">Collections</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="icons">
+      <div id="nav-user" style="font-size:0.9rem; font-weight:500;"></div>
+      <div class="cart-icon" id="cart-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span class="cart-count" id="cart-count-badge">0</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header style="height:100vh; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+    <div style="position:absolute; top:0; left:0; width:100%; height:100%; background:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=2000') center/cover; opacity:0.4; z-index:-1;"></div>
+    <div class="container text-center animate-on-scroll" style="text-align:center;">
+      <h1 style="font-size:5rem; letter-spacing:10px; margin-bottom:20px; text-transform:uppercase;">Defy Limits</h1>
+      <p style="font-size:1.2rem; color:var(--text-secondary); max-width:600px; margin:0 auto 40px auto; font-family:var(--font-sans); font-weight:300;">Discover the new collection of impossible silhouettes and zero-gravity comfort.</p>
+      <a href="#collections" class="btn btn-primary">Shop Collection</a>
+    </div>
+  </header>
+
+  <!-- Featured Collections -->
+  <section id="collections" class="section container">
+    <div style="display:flex; justify-content:space-between; align-items:end; margin-bottom:50px;" class="animate-on-scroll">
+      <div>
+        <h3 style="color:var(--accent-gold); font-size:0.9rem; letter-spacing:3px; text-transform:uppercase; font-family:var(--font-sans)">Curated</h3>
+        <h2 style="font-size:3rem;">New Arrivals</h2>
+      </div>
+      <a href="#" style="border-bottom:1px solid white; padding-bottom:5px;">View All</a>
+    </div>
+
+    <div class="grid animate-on-scroll" id="product-grid">
+      <!-- Hardcoded for seamless demo, scalable via API -->
+      <div class="product-card">
+        <a href="product.html?id=1" style="display:block; overflow:hidden;"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600" class="product-img" alt="Watch"></a>
+        <div class="product-info">
+          <h4 class="product-title">Timeless Chrono</h4>
+          <p class="product-price">$299.00</p>
+          <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="Cart.add({id:'1', name:'Timeless Chrono', price: 299.00, img:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600'})">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <a href="product.html?id=2" style="display:block; overflow:hidden;"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=600" class="product-img" alt="Headphones"></a>
+        <div class="product-info">
+          <h4 class="product-title">Aura ANC Headphones</h4>
+          <p class="product-price">$350.00</p>
+          <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="Cart.add({id:'2', name:'Aura ANC Headphones', price: 350.00, img:'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=600'})">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <a href="product.html?id=3" style="display:block; overflow:hidden;"><img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&q=80&w=600" class="product-img" alt="Camera"></a>
+        <div class="product-info">
+          <h4 class="product-title">Focus Lens Retro</h4>
+          <p class="product-price">$850.00</p>
+          <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="Cart.add({id:'3', name:'Focus Lens Retro', price: 850.00, img:'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&q=80&w=600'})">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Auth Modal -->
+  <div class="overlay" id="auth-modal">
+    <div class="modal">
+      <button class="close-btn" onclick="UI.closeModal('auth-modal')">&times;</button>
+      <h2 style="margin-bottom:20px; font-size:2rem; color:var(--accent-gold);">Access Required</h2>
+      <p style="color:var(--text-secondary); margin-bottom:30px; font-size:0.9rem;">You must sign in to experience the full Gravity platform.</p>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+      </form>
+
+      <div style="margin-top:20px; text-align:center;">
+        <span style="color:var(--text-secondary); font-size:0.8rem;">Don't have an account?</span>
+        <button onclick="document.getElementById('login-form').style.display='none'; document.getElementById('signup-form').style.display='block';" style="background:none; border:none; color:var(--accent-blue); cursor:pointer; font-size:0.8rem; margin-left:5px;">Sign Up</button>
+      </div>
+
+      <form id="signup-form" style="display:none; margin-top:-20px;">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Cart Drawer -->
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h2>Your Cart</h2>
+      <button id="close-cart" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+    <div class="cart-items" id="cart-items-list">
+      <!-- Injected by JS -->
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cart-total-price" style="color:var(--accent-gold);">$0.00</span>
+      </div>
+      <button class="btn btn-primary" style="width:100%; padding:15px; font-size:1rem;" onclick="proceedToCheckout()">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="background:#050505; padding:80px 5%; border-top:1px solid rgba(255,255,255,0.05); margin-top:100px;">
+    <div class="grid">
+      <div>
+        <h2 style="font-size:2rem; margin-bottom:20px;">GRAVITY</h2>
+        <p style="color:var(--text-secondary); font-size:0.9rem;">Elevating the modern aesthetic through impeccable design and uncompromising quality.</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:20px; font-family:var(--font-sans)">Join Gravity</h4>
+        <input type="email" placeholder="Enter your email" style="width:100%; padding:10px; background:transparent; border:none; border-bottom:1px solid #333; color:white; margin-bottom:20px;">
+        <button class="btn">Subscribe</button>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

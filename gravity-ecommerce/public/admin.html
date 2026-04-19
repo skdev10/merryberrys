@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Gravity</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="background:#050505; display:flex;">
+
+  <!-- Sidebar -->
+  <aside style="width:250px; background:#111; height:100vh; position:sticky; top:0; padding:30px; border-right:1px solid rgba(255,255,255,0.05);">
+    <h2 style="font-size:1.5rem; letter-spacing:2px; margin-bottom:50px; color:var(--accent-gold);">GRAVITY<span style="color:#fff;font-size:0.8rem;display:block;letter-spacing:1px;font-family:var(--font-sans)">ADMIN</span></h2>
+    
+    <ul style="display:flex; flex-direction:column; gap:20px; font-family:var(--font-sans);">
+      <li><a href="#" style="color:var(--accent-gold); font-weight:600;">Dashboard</a></li>
+      <li><a href="#" style="color:var(--text-secondary); hover:color:white;">Products</a></li>
+      <li><a href="#" style="color:var(--text-secondary); hover:color:white;">Orders</a></li>
+      <li><a href="#" style="color:var(--text-secondary); hover:color:white;">Users</a></li>
+      <li><a href="#" style="color:var(--text-secondary); hover:color:white;">Content Mgmt</a></li>
+      <li><a href="#" style="color:var(--text-secondary); hover:color:white;">Media</a></li>
+    </ul>
+
+    <button class="btn" style="position:absolute; bottom:30px; width:calc(100% - 60px);" onclick="localStorage.removeItem('gravity_admin_token'); window.location.href='/'">Logout Admin</button>
+  </aside>
+
+  <!-- Main Content -->
+  <main style="flex:1; padding:50px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+      <h1 style="font-size:2.5rem;">Dashboard Overview</h1>
+      <button class="btn btn-primary">+ Add Product</button>
+    </div>
+
+    <!-- Stats Injected by admin.js -->
+    <div id="admin-stats">
+      <p style="color:#aaa;">Loading statistics...</p>
+    </div>
+
+    <div style="margin-top:60px;">
+      <h2 style="font-size:1.8rem; margin-bottom:20px;">Recent Orders</h2>
+      <table style="width:100%; text-align:left; border-collapse:collapse; background:#111; border-radius:8px; overflow:hidden;">
+        <thead style="background:#1a1a1a; font-family:var(--font-sans); font-size:0.9rem; color:#aaa;">
+          <tr>
+            <th style="padding:20px;">Order ID</th>
+            <th style="padding:20px;">Customer</th>
+            <th style="padding:20px;">Amount</th>
+            <th style="padding:20px;">Status</th>
+            <th style="padding:20px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody style="font-size:0.95rem;">
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:20px; font-family:monospace;">64a8b9f1d...</td>
+            <td style="padding:20px;">alex@example.com</td>
+            <td style="padding:20px; color:var(--accent-gold);">$350.00</td>
+            <td style="padding:20px;"><span style="background:rgba(212, 175, 55, 0.2); color:var(--accent-gold); padding:5px 10px; border-radius:4px; font-size:0.8rem;">Pending</span></td>
+            <td style="padding:20px;">
+              <select style="background:#222; border:1px solid #333; color:white; padding:5px; border-radius:4px;">
+                <option>Pending</option>
+                <option>Shipped</option>
+                <option>Delivered</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px; font-family:monospace;">64a8c012e...</td>
+            <td style="padding:20px;">sarah@example.com</td>
+            <td style="padding:20px; color:var(--accent-gold);">$850.00</td>
+            <td style="padding:20px;"><span style="background:rgba(0, 210, 255, 0.2); color:var(--accent-blue); padding:5px 10px; border-radius:4px; font-size:0.8rem;">Shipped</span></td>
+            <td style="padding:20px;">
+              <select style="background:#222; border:1px solid #333; color:white; padding:5px; border-radius:4px;">
+                <option>Pending</option>
+                <option selected>Shipped</option>
+                <option>Delivered</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

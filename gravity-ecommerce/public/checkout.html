@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | Gravity</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background:#050505;">
+
+  <nav style="position:relative; background:#000;">
+    <a href="/" class="logo">GRAVITY</a>
+    <a href="/" style="color:var(--text-secondary);">&larr; Return to Shop</a>
+  </nav>
+
+  <div class="container section">
+    <div style="display:flex; gap:50px; flex-wrap:wrap;">
+      
+      <!-- Checkout Form -->
+      <div style="flex:1; min-width:300px;">
+        <h2 style="margin-bottom:30px; font-size:2.5rem;">Secure Checkout</h2>
+        <form id="payment-form">
+          <h3 style="margin-bottom:15px; font-family:var(--font-sans); color:var(--accent-gold);">1. Shipping Address</h3>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="form-group"><input type="text" id="fname" placeholder="First Name" required></div>
+            <div class="form-group"><input type="text" id="lname" placeholder="Last Name" required></div>
+          </div>
+          <div class="form-group"><input type="text" id="address" placeholder="Full Address" required></div>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:15px; margin-bottom:30px;">
+            <div class="form-group"><input type="text" id="city" placeholder="City" required></div>
+            <div class="form-group"><input type="text" id="zip" placeholder="Zip Code" required></div>
+          </div>
+
+          <h3 style="margin-bottom:15px; font-family:var(--font-sans); color:var(--accent-gold);">2. Payment (Stripe)</h3>
+          <!-- Mock Stripe Element Container -->
+          <div style="padding:15px; background:var(--bg-panel); border:1px solid rgba(255,255,255,0.1); border-radius:4px; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+              <span style="color:#aaa;">Card Number</span>
+              <span style="color:#aaa;">MM/YY CVC</span>
+            </div>
+            <input type="text" placeholder="**** **** **** 4242" style="width:100%; background:transparent; border:none; color:white; font-size:1.1rem;" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:15px; font-size:1.1rem;" id="submit-btn">Pay Now</button>
+        </form>
+      </div>
+
+      <!-- Order Summary -->
+      <div style="width:350px; max-width:100%;">
+        <div style="background:var(--bg-panel); padding:30px; border-radius:8px; position:sticky; top:20px;">
+          <h3 style="margin-bottom:20px; font-family:var(--font-sans); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Order Summary</h3>
+          <div id="checkout-items" style="margin-bottom:20px;"></div>
+          <div style="display:flex; justify-content:space-between; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+            <span style="font-size:1.2rem;">Total</span>
+            <span style="color:var(--accent-gold); font-size:1.5rem; font-family:var(--font-serif);" id="checkout-total">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Success Overlay -->
+  <div class="overlay" id="success-modal">
+    <div class="modal" style="text-align:center;">
+      <div style="width:80px; height:80px; border-radius:50%; background:var(--accent-gradient); margin:0 auto 20px auto; display:flex; align-items:center; justify-content:center;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h2 style="margin-bottom:10px; color:var(--accent-gold);">Payment Successful</h2>
+      <p style="color:var(--text-secondary); margin-bottom:20px;">Your premium order has been processed. A confirmation email has been sent to you and the Gravity admin.</p>
+      <button class="btn btn-primary" onclick="window.location.href='/'">Return to Home</button>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Must be logged in to checkout
+      if (!Auth.isAuthenticated()) {
+        window.location.href = '/';
+        return;
+      }
+
+      // Render Summary
+      const list = document.getElementById('checkout-items');
+      const totalEl = document.getElementById('checkout-total');
+      
+      cart.forEach(item => {
+        list.innerHTML += `
+          <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <span style="color:#aaa; font-size:0.9rem;">${item.name} (x${item.quantity})</span>
+            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+          </div>
+        `;
+      });
+      totalEl.innerText = `$${Cart.getTotal().toFixed(2)}`;
+
+      // Handle Submit
+      document.getElementById('payment-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = 'Processing...';
+        btn.disabled = true;
+
+        const payload = {
+          items: cart.map(i => ({ product: i.id, name: i.name, quantity: i.quantity, price: i.price, size: 'M', color: 'Default' })),
+          totalAmount: Cart.getTotal(),
+          shippingAddress: {
+            fullName: document.getElementById('fname').value + ' ' + document.getElementById('lname').value,
+            address: document.getElementById('address').value,
+            city: document.getElementById('city').value,
+            zip: document.getElementById('zip').value
+          },
+          paymentIntentId: 'pi_mock_' + Math.floor(Math.random()*100000)
+        };
+
+        try {
+          const token = Auth.getToken();
+          const res = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (res.ok) {
+            localStorage.removeItem('gravity_cart'); // clear cart
+            document.getElementById('success-modal').classList.add('active');
+          } else {
+            alert('Payment error: ' + (data.error || 'Unknown'));
+            btn.innerText = 'Pay Now';
+            btn.disabled = false;
+          }
+        } catch(err) {
+          alert('Network Error');
+          btn.innerText = 'Pay Now';
+          btn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
