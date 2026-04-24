@@ -63,7 +63,7 @@ export default function CheckoutPage() {
       // Process order
       alert('Order placed successfully!');
       localStorage.removeItem('cart');
-      router.push('/order-confirmation');
+      router.push('/confirmation');
     }
   };
 
