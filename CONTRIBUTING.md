@@ -32,7 +32,7 @@ We welcome contributions from everyone, whether it's fixing a bug, adding a new 
 - Follow existing folder structure and naming conventions
 
 ---
-
+ 
 ## Contribution Guidelines
 
 - **Small, Focused PRs** → Don’t bundle unrelated changes in one PR  

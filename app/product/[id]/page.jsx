@@ -1,15 +1,16 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import LuxuryNavbar from '../../../components/LuxuryNavbar';
 import RemoteImg from '@/components/RemoteImg';
-import { Heart, Truck, Shield, RefreshCw, ChevronLeft, ChevronRight, Star, ShoppingBag, Lock } from 'lucide-react';
+import { Heart, Truck, Shield, RefreshCw, ChevronLeft, ChevronRight, Star, ShoppingBag } from 'lucide-react';
 import { parseProductImages, primaryProductImage, PLACEHOLDER_IMAGE } from '@/lib/productImages';
 import { segmentId } from '@/lib/routeParams';
+import { addCartItem, FREE_SHIPPING_THRESHOLD } from '@/lib/cart';
+import { formatPrice } from '@/lib/currency';
 
 export default function ProductPage() {
-  const pathname = usePathname();
   const params = useParams();
   const productId = segmentId(params?.id);
 
@@ -21,14 +22,6 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!user && !!token);
-  }, []);
 
   useEffect(() => {
     if (!productId) {
@@ -89,35 +82,17 @@ export default function ProductPage() {
   }, [productId]);
 
   const handleAddToCart = () => {
-    if (!isLoggedIn) {
-      setShowLoginModal(true);
-      return;
-    }
-
-    const cartItem = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: primaryProductImage(product.images),
-      category: product.category?.name,
+    addCartItem(
+      {
+        ...product,
+        image: primaryProductImage(product.images),
+      },
+      {
       size: selectedSize,
       color: selectedColor,
       quantity,
-    };
-
-    const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItemIndex = existingCart.findIndex(
-      (item) => item.id === product.id && item.size === selectedSize && item.color === selectedColor
+      }
     );
-
-    if (existingItemIndex >= 0) {
-      existingCart[existingItemIndex].quantity += quantity;
-    } else {
-      existingCart.push(cartItem);
-    }
-
-    localStorage.setItem('cart', JSON.stringify(existingCart));
-    window.dispatchEvent(new Event('cart-updated'));
     alert('Added to cart!');
   };
 
@@ -258,7 +233,7 @@ export default function ProductPage() {
                 <p className="text-luxury-caption mb-3 text-luxury-taupe">{product.category?.name}</p>
                 <h1 className="font-serif mb-4 text-4xl text-luxury-black md:text-5xl">{product.name}</h1>
                 <div className="flex flex-wrap items-center gap-4">
-                  <p className="text-2xl text-luxury-black">${product.price}</p>
+                  <p className="text-2xl text-luxury-black">{formatPrice(product.price)}</p>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} size={14} className="fill-luxury-gold text-luxury-gold" />
@@ -343,7 +318,7 @@ export default function ProductPage() {
                 <button type="button" onClick={handleAddToCart} className="btn-luxury flex-1">
                   <span className="flex items-center justify-center gap-2">
                     <ShoppingBag size={18} />
-                    {isLoggedIn ? 'Add to cart' : 'Login to add'}
+                    Add to cart
                   </span>
                 </button>
                 <button
@@ -363,22 +338,24 @@ export default function ProductPage() {
                 <div className="flex items-start gap-3">
                   <Truck size={18} className="mt-0.5 text-luxury-taupe" />
                   <div>
-                    <p className="text-sm font-medium text-luxury-black">Complimentary shipping over $200</p>
-                    <p className="text-xs text-luxury-taupe">Delivered in 3–5 business days</p>
+                    <p className="text-sm font-medium text-luxury-black">
+                      Free shipping over {formatPrice(FREE_SHIPPING_THRESHOLD)}
+                    </p>
+                    <p className="text-xs text-luxury-taupe">Delivered nationwide in 2–4 business days</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <RefreshCw size={18} className="mt-0.5 text-luxury-taupe" />
                   <div>
-                    <p className="text-sm font-medium text-luxury-black">Free returns within 30 days</p>
-                    <p className="text-xs text-luxury-taupe">Hassle‑free return process</p>
+                    <p className="text-sm font-medium text-luxury-black">7-day easy returns</p>
+                    <p className="text-xs text-luxury-taupe">Hassle‑free return process in Pakistan</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Shield size={18} className="mt-0.5 text-luxury-taupe" />
                   <div>
                     <p className="text-sm font-medium text-luxury-black">Secure payment</p>
-                    <p className="text-xs text-luxury-taupe">Your data is protected</p>
+                    <p className="text-xs text-luxury-taupe">Bank-grade security for your data</p>
                   </div>
                 </div>
               </div>
@@ -406,7 +383,7 @@ export default function ProductPage() {
                     <h3 className="font-serif mb-1 text-lg text-luxury-black transition-colors group-hover:text-luxury-gold">
                       {rp.name}
                     </h3>
-                    <p className="text-sm text-luxury-taupe">${rp.price}</p>
+                    <p className="text-sm text-luxury-taupe">{formatPrice(rp.price)}</p>
                   </Link>
                 ))}
               </div>
@@ -414,41 +391,6 @@ export default function ProductPage() {
           )}
         </div>
       </main>
-
-      {showLoginModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-luxury-black/80 p-4">
-          <div className="relative w-full max-w-md bg-luxury-white p-8">
-            <button
-              type="button"
-              onClick={() => setShowLoginModal(false)}
-              className="absolute right-4 top-4 text-luxury-taupe hover:text-luxury-black"
-            >
-              ✕
-            </button>
-
-            <div className="mb-8 text-center">
-              <Lock size={48} className="mx-auto mb-4 text-luxury-gold" strokeWidth={1} />
-              <h2 className="font-serif mb-2 text-2xl text-luxury-black">Login required</h2>
-              <p className="text-sm text-luxury-taupe">Sign in to add items to your cart.</p>
-            </div>
-
-            <div className="space-y-4">
-              <Link
-                href={`/login?redirect=${encodeURIComponent(pathname || '/shop')}`}
-                className="btn-luxury block w-full text-center"
-              >
-                <span>Login</span>
-              </Link>
-              <Link
-                href={`/register?redirect=${encodeURIComponent(pathname || '/shop')}`}
-                className="btn-luxury-outline block w-full text-center"
-              >
-                <span>Create account</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
 
       <footer className="bg-luxury-black py-12 text-luxury-white">
         <div className="container-luxury text-center">

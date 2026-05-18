@@ -12,6 +12,7 @@ import {
     Download
 } from "lucide-react"
 import Link from "next/link"
+import { formatPrice } from "@/lib/currency"
 
 export default function OrdersPage() {
     const [orders, setOrders] = useState([])
@@ -184,7 +185,7 @@ export default function OrdersPage() {
                                                 {new Date(order.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="p-4">
-                                                <p className="text-white font-medium">${order.total?.toFixed(2)}</p>
+                                                <p className="text-white font-medium">{formatPrice(order.total)}</p>
                                             </td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">

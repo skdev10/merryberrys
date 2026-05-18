@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import LuxuryNavbar from '@/components/LuxuryNavbar';
@@ -18,6 +18,12 @@ function RegisterForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (isLoggedIn()) {
+      router.replace(redirect === '/register' ? '/account' : redirect);
+    }
+  }, [router, redirect]);
+
   const onSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -33,9 +39,8 @@ function RegisterForm() {
         setError(data.message || 'Registration failed');
         return;
       }
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      router.push(redirect);
+      setAuth(data.token, data.user);
+      router.push(redirect === '/register' ? '/account' : redirect);
       router.refresh();
     } catch {
       setError('Something went wrong. Try again.');

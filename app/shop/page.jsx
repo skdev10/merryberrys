@@ -3,8 +3,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import LuxuryNavbar from '../../components/LuxuryNavbar';
 import RemoteImg from '@/components/RemoteImg';
-import { SlidersHorizontal, X, ChevronDown, Grid3X3, LayoutGrid } from 'lucide-react';
+import { SlidersHorizontal, X, ChevronDown, Grid3X3, LayoutGrid, Search } from 'lucide-react';
 import { primaryProductImage } from '@/lib/productImages';
+import { addCartItem } from '@/lib/cart';
+import { formatPrice } from '@/lib/currency';
+import Reveal from '@/components/Reveal';
 
 const sortOptions = ['Featured', 'Newest', 'Price: Low to High', 'Price: High to Low'];
 
@@ -14,19 +17,23 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('Featured');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [gridCols, setGridCols] = useState(3);
+  const [view, setView] = useState('grid-3');
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const boot = async () => {
       let initialCat = '';
+      let initialSearch = '';
       if (typeof window !== 'undefined') {
-        const q = new URLSearchParams(window.location.search).get('category');
-        if (q) initialCat = q;
+        const q = new URLSearchParams(window.location.search);
+        if (q.get('category')) initialCat = q.get('category');
+        if (q.get('search')) initialSearch = q.get('search');
       }
       await fetchCategories();
       if (initialCat) setSelectedCategory(initialCat);
-      await fetchProducts(initialCat);
+      if (initialSearch) setSearchQuery(initialSearch);
+      await fetchProducts(initialCat, initialSearch);
     };
     boot();
   }, []);
@@ -41,12 +48,13 @@ export default function ShopPage() {
     }
   };
 
-  const fetchProducts = async (categoryId = '') => {
+  const fetchProducts = async (categoryId = '', search = '') => {
     setIsLoading(true);
     try {
-      const url = categoryId 
-        ? `/api/products?category=${categoryId}` 
-        : '/api/products';
+      let url = '/api/products?';
+      if (categoryId) url += `category=${encodeURIComponent(categoryId)}&`;
+      if (search) url += `search=${encodeURIComponent(search)}`;
+      
       const response = await fetch(url, { cache: 'no-store' });
       const data = await response.json();
       setProducts(data.products || []);
@@ -59,7 +67,7 @@ export default function ShopPage() {
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
-    fetchProducts(categoryId);
+    fetchProducts(categoryId, searchQuery);
   };
 
   const filteredProducts = [...products].sort((a, b) => {
@@ -68,161 +76,179 @@ export default function ShopPage() {
         return a.price - b.price;
       case 'Price: High to Low':
         return b.price - a.price;
-      case 'Newest':
-        return new Date(b.createdAt) - new Date(a.createdAt);
       default:
         return 0;
     }
   });
+
+  const handleAddToCart = (product) => {
+    addCartItem({
+      ...product,
+      image: primaryProductImage(product.images),
+    });
+    alert('Added to cart!');
+  };
 
   return (
     <>
       <LuxuryNavbar />
       
       <main className="pt-32 pb-20 bg-luxury-white min-h-screen">
-        {/* Header */}
-        <div className="container-luxury mb-12">
-          <div className="text-center mb-12">
-            <p className="text-luxury-caption text-luxury-taupe mb-4">Collection</p>
-            <h1 className="text-luxury-subheading text-luxury-black">
-              All Products
+        <div className="container-luxury">
+          {/* Header */}
+          <div className="mb-12">
+            <h1 className="text-luxury-subheading text-luxury-black mb-4">
+              {selectedCategory ? categories.find(c => c.slug === selectedCategory)?.name : 'Shop All'}
             </h1>
+            <p className="text-luxury-taupe max-w-2xl">
+              Explore our collection of meticulously crafted essentials, designed for the modern lifestyle.
+            </p>
           </div>
 
           {/* Filters Bar */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 py-6 border-t border-b border-luxury-light-gray/20">
-            {/* Left - Category Filters */}
-            <div className="flex items-center gap-6 overflow-x-auto pb-2 md:pb-0">
-              <button 
-                onClick={() => setMobileFiltersOpen(true)}
-                className="md:hidden flex items-center gap-2 text-sm uppercase tracking-[0.1em]"
-              >
-                <SlidersHorizontal size={16} /> Filters
-              </button>
-              
-              <div className="hidden md:flex items-center gap-6">
-                <button
-                  onClick={() => handleCategoryChange('')}
-                  className={`text-sm uppercase tracking-[0.1em] transition-colors ${
-                    selectedCategory === '' 
-                      ? 'text-luxury-black border-b border-luxury-black pb-1' 
-                      : 'text-luxury-taupe hover:text-luxury-black'
-                  }`}
-                >
-                  All
-                </button>
-                {categories.slice(0, 8).map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => handleCategoryChange(cat.id)}
-                    className={`text-sm uppercase tracking-[0.1em] transition-colors whitespace-nowrap ${
-                      selectedCategory === cat.id 
-                        ? 'text-luxury-black border-b border-luxury-black pb-1' 
-                        : 'text-luxury-taupe hover:text-luxury-black'
-                    }`}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
+            {/* Left - Search & Category Filters */}
+            <div className="flex-1 flex flex-col md:flex-row md:items-center gap-6">
+              <div className="relative w-full md:w-64">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    fetchProducts(selectedCategory, e.target.value);
+                  }}
+                  className="w-full pl-10 pr-4 py-2 bg-luxury-cream border border-luxury-light-gray/10 text-sm focus:outline-none focus:border-luxury-gold transition-colors"
+                />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-luxury-taupe" />
               </div>
             </div>
 
             {/* Right - Sort & View */}
             <div className="flex items-center gap-6">
-              <div className="relative">
-                <button className="flex items-center gap-2 text-sm text-luxury-taupe hover:text-luxury-black transition-colors peer">
-                  Sort by: <span className="text-luxury-black">{sortBy}</span>
+              <div className="relative group">
+                <button className="flex items-center gap-2 text-sm uppercase tracking-[0.1em] text-luxury-black">
+                  Sort: <span className="text-luxury-taupe">{sortBy}</span>
                   <ChevronDown size={14} />
                 </button>
-                <div className="absolute top-full right-0 mt-2 w-48 bg-luxury-white border border-luxury-light-gray/20 shadow-lg opacity-0 invisible peer-hover:opacity-100 peer-hover:visible hover:opacity-100 hover:visible transition-all z-10">
-                  {sortOptions.map((option) => (
-                    <button
-                      key={option}
-                      onClick={() => setSortBy(option)}
-                      className={`block w-full text-left px-4 py-3 text-sm hover:bg-luxury-cream transition-colors ${
-                        sortBy === option ? 'text-luxury-black' : 'text-luxury-taupe'
-                      }`}
-                    >
-                      {option}
-                    </button>
-                  ))}
+                <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                  <div className="bg-luxury-white border border-luxury-light-gray/10 shadow-xl py-2 min-w-[200px]">
+                    {sortOptions.map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => setSortBy(option)}
+                        className="w-full text-left px-6 py-2 text-xs uppercase tracking-[0.1em] text-luxury-taupe hover:text-luxury-black hover:bg-luxury-cream transition-colors"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="hidden md:flex items-center gap-2 border-l border-luxury-light-gray/20 pl-6">
+              <div className="hidden md:flex items-center gap-2 pl-6 border-l border-luxury-light-gray/20">
                 <button 
-                  onClick={() => setGridCols(2)}
-                  className={`p-2 transition-colors ${gridCols === 2 ? 'text-luxury-black' : 'text-luxury-taupe'}`}
+                  onClick={() => setView('grid-3')}
+                  className={`p-1 transition-colors ${view === 'grid-3' ? 'text-luxury-black' : 'text-luxury-taupe'}`}
                 >
-                  <LayoutGrid size={18} />
+                  <Grid3X3 size={20} />
                 </button>
                 <button 
-                  onClick={() => setGridCols(3)}
-                  className={`p-2 transition-colors ${gridCols === 3 ? 'text-luxury-black' : 'text-luxury-taupe'}`}
+                  onClick={() => setView('grid-2')}
+                  className={`p-1 transition-colors ${view === 'grid-2' ? 'text-luxury-black' : 'text-luxury-taupe'}`}
                 >
-                  <Grid3X3 size={18} />
+                  <LayoutGrid size={20} />
                 </button>
               </div>
             </div>
           </div>
 
-          <p className="mt-6 text-sm text-luxury-taupe">
-            Showing {filteredProducts.length} products
-          </p>
-        </div>
-
-        {/* Products Grid */}
-        <div className="container-luxury">
-          {isLoading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="aspect-[3/4] bg-luxury-cream mb-4" />
-                  <div className="h-4 bg-luxury-cream w-3/4 mb-2" />
-                  <div className="h-4 bg-luxury-cream w-1/4" />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className={`grid gap-6 md:gap-8 ${
-              gridCols === 2 ? 'grid-cols-2 lg:grid-cols-2' : 'grid-cols-2 lg:grid-cols-3'
-            }`}>
-              {filteredProducts.map((product, index) => {
-                return (
-                  <div 
-                    key={product.id}
-                    className="group"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    <Link href={`/product/${product.id}`} prefetch={false} className="block group">
-                      <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-luxury-cream">
-                        <RemoteImg
-                          src={primaryProductImage(product.images)}
-                          alt={product.name}
-                          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                          <button className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors">
-                            Quick View
-                          </button>
-                        </div>
-                      </div>
-                      <h3 className="font-serif text-lg text-luxury-black mb-1 group-hover:text-luxury-gold transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-luxury-taupe">
-                        ${product.price}
-                      </p>
-                    </Link>
-                  </div>
-                );
-              })}
+          {/* Active Filters */}
+          {(selectedCategory || searchQuery) && (
+            <div className="flex flex-wrap gap-3 py-6">
+              {selectedCategory && (
+                <button 
+                  onClick={() => handleCategoryChange('')}
+                  className="flex items-center gap-2 px-4 py-1.5 bg-luxury-cream border border-luxury-light-gray/10 text-xs uppercase tracking-[0.1em] text-luxury-black hover:border-luxury-gold transition-colors"
+                >
+                  {categories.find(c => c.slug === selectedCategory)?.name}
+                  <X size={12} />
+                </button>
+              )}
+              {searchQuery && (
+                <button 
+                  onClick={() => {
+                    setSearchQuery('');
+                    fetchProducts(selectedCategory, '');
+                  }}
+                  className="flex items-center gap-2 px-4 py-1.5 bg-luxury-cream border border-luxury-light-gray/10 text-xs uppercase tracking-[0.1em] text-luxury-black hover:border-luxury-gold transition-colors"
+                >
+                  Search: {searchQuery}
+                  <X size={12} />
+                </button>
+              )}
             </div>
           )}
 
-          {!isLoading && filteredProducts.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-luxury-taupe text-lg">No products found</p>
+          {/* Products Grid */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-12">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="space-y-4 animate-pulse">
+                  <div className="aspect-[3/4] bg-luxury-cream" />
+                  <div className="h-4 bg-luxury-cream w-2/3" />
+                  <div className="h-4 bg-luxury-cream w-1/3" />
+                </div>
+              ))}
+            </div>
+          ) : products.length > 0 ? (
+            <div className={`grid gap-8 py-12 ${
+              view === 'grid-3' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'
+            }`}>
+              {products.map((product) => (
+                <Reveal key={product.id} className="group" data-group>
+                  <Link href={`/product/${product.id}`} className="block group">
+                    <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-luxury-cream">
+                      <RemoteImg
+                        src={primaryProductImage(product.images)}
+                        alt={product.name}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddToCart(product);
+                          }}
+                          className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors"
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                    <h3 className="font-serif text-lg text-luxury-black mb-1 group-hover:text-luxury-gold transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-luxury-taupe">
+                      {formatPrice(product.price)}
+                    </p>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center">
+              <p className="text-luxury-taupe">No products found matching your criteria.</p>
+              <button 
+                onClick={() => {
+                  setSelectedCategory('');
+                  setSearchQuery('');
+                  fetchProducts('', '');
+                }}
+                className="mt-4 text-sm uppercase tracking-[0.1em] text-luxury-black border-b border-luxury-black pb-1"
+              >
+                Reset all filters
+              </button>
             </div>
           )}
         </div>
@@ -255,9 +281,9 @@ export default function ShopPage() {
                 {categories.map((cat) => (
                   <button
                     key={cat.id}
-                    onClick={() => { handleCategoryChange(cat.id); setMobileFiltersOpen(false); }}
+                    onClick={() => { handleCategoryChange(cat.slug); setMobileFiltersOpen(false); }}
                     className={`block w-full text-left py-2 ${
-                      selectedCategory === cat.id ? 'text-luxury-black font-medium' : 'text-luxury-taupe'
+                      selectedCategory === cat.slug ? 'text-luxury-black font-medium' : 'text-luxury-taupe'
                     }`}
                   >
                     {cat.name}

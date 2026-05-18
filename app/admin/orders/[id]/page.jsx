@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Package } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 export default function AdminOrderDetailPage() {
   const params = useParams();
@@ -102,13 +103,13 @@ export default function AdminOrderDetailPage() {
             <li key={item.id} className="p-4 flex justify-between gap-4 text-sm">
               <span className="text-white">{item.product?.name || 'Product'}</span>
               <span className="text-zinc-400">
-                ×{item.quantity} @ ${Number(item.price).toFixed(2)}
+                ×{item.quantity} @ {formatPrice(item.price)}
               </span>
             </li>
           ))}
         </ul>
         <div className="p-4 bg-zinc-900/40 text-right text-white font-semibold">
-          Total: ${Number(order.total).toFixed(2)}
+          Total: {formatPrice(order.total)}
         </div>
       </div>
     </div>

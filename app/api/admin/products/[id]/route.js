@@ -53,7 +53,8 @@ export async function PUT(request, context) {
                 sizes: JSON.stringify(data.sizes || ['S', 'M', 'L', 'XL']),
                 colors: JSON.stringify(data.colors || ['Black', 'White']),
                 categoryId: data.categoryId,
-                inStock: data.inStock
+                inStock: data.inStock,
+                stockQuantity: Math.max(0, parseInt(data.stockQuantity ?? 0, 10) || 0)
             }
         });
 

@@ -23,7 +23,7 @@ This document summarizes how the repo is organized for Vercel, what was fixed fo
    **Symptom:** Links pointed to `/admin/orders/[id]` with no page.  
    **Fix:** Added `app/admin/orders/[id]/page.jsx` that loads the order via the new API.
 
-3. **Checkout success redirect**  
+3. **Checkout success redirect**   
    **Symptom:** After checkout, `router.push('/order-confirmation')` targeted a route that does not exist (confirmation lives at `/confirmation`).  
    **Fix:** Redirect updated to `/confirmation`.
 
@@ -45,7 +45,16 @@ Set these in **Vercel → Project → Settings → Environment Variables** (and 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | PostgreSQL connection string (`sslmode=require` for hosted DBs). |
-| `NEXT_PUBLIC_CURRENCY_SYMBOL` | No | Defaults to `$` in code if unset. |
+| `NEXT_PUBLIC_CURRENCY_SYMBOL` | No | Defaults to `Rs.` in code; set to `Rs.` for Pakistani Rupees. |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | No | Public support email displayed on the footer/contact page. |
+| `NEXT_PUBLIC_CONTACT_PHONE` | No | Public Pakistan phone/WhatsApp number displayed on the footer/contact page. |
+| `NEXT_PUBLIC_INSTAGRAM_URL` | No | Public Instagram URL. |
+| `NEXT_PUBLIC_FACEBOOK_URL` | No | Public Facebook URL. |
+| `NEXT_PUBLIC_BANK_NAME` | No | Bank name shown during bank transfer checkout. |
+| `NEXT_PUBLIC_BANK_ACCOUNT_TITLE` | No | Bank account title shown during bank transfer checkout. |
+| `NEXT_PUBLIC_BANK_ACCOUNT_NUMBER` | No | Bank account number shown during bank transfer checkout. |
+| `NEXT_PUBLIC_WALLET_TITLE` | No | JazzCash/Easypaisa wallet title shown during digital payment checkout. |
+| `NEXT_PUBLIC_WALLET_NUMBER` | No | JazzCash/Easypaisa wallet number shown during digital payment checkout. |
 
 After setting `DATABASE_URL`, run migrations or push schema against that database:
 

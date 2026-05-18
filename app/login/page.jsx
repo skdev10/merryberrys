@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import LuxuryNavbar from '@/components/LuxuryNavbar';
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { isLoggedIn, setAuth } from '@/lib/auth';
 
 function LoginForm() {
   const router = useRouter();
@@ -16,6 +17,12 @@ function LoginForm() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isLoggedIn()) {
+      router.replace(redirect === '/login' ? '/account' : redirect);
+    }
+  }, [router, redirect]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -32,9 +39,8 @@ function LoginForm() {
         setError(data.message || 'Login failed');
         return;
       }
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      router.push(redirect);
+      setAuth(data.token, data.user);
+      router.push(redirect === '/login' ? '/account' : redirect);
       router.refresh();
     } catch {
       setError('Something went wrong. Try again.');

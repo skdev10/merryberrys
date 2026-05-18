@@ -11,7 +11,8 @@ export async function GET() {
                     include: {
                         product: true
                     }
-                }
+                },
+                transactions: true
             },
             orderBy: {
                 createdAt: 'desc'

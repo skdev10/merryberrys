@@ -20,13 +20,13 @@ export default function Footer() {
                 </span>
               </Link>
               <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-                Experience the finest in luxury fashion and customizable apparel. Premium quality with outstanding design for every occasion.
+                Pakistan-based fashion, custom prints, and everyday essentials delivered nationwide with premium finishing.
               </p>
               <div className="flex space-x-3">
-                <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-berry-500 hover:bg-berry-500/10 transition-all">
+                <a href={process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com/share/1abt67TZu4/"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-berry-500 hover:bg-berry-500/10 transition-all">
                   <Facebook size={18} />
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-berry-500 hover:bg-berry-500/10 transition-all">
+                <a href={process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/merryberry.pk?igsh=MXZqZWNqcmdwbHFsOQ=="} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-berry-500 hover:bg-berry-500/10 transition-all">
                   <Instagram size={18} />
                 </a>
                 <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-berry-500 hover:bg-berry-500/10 transition-all">
@@ -54,11 +54,10 @@ export default function Footer() {
             <div>
               <h4 className="text-white font-serif text-lg mb-6 tracking-wide">Categories</h4>
               <ul className="space-y-3">
-                <li><Link href="/shop/men-lower" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Men's Lower</Link></li>
-                <li><Link href="/shop/men-upper" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Men's Upper</Link></li>
-                <li><Link href="/shop/women" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Women's Collection</Link></li>
-                <li><Link href="/shop/kids" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Kids' Collection</Link></li>
-                <li><Link href="/shop/winter-collection" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Winter Collection</Link></li>
+                <li><Link href="/shop?category=baggy-jeans" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Men's Lower</Link></li>
+                <li><Link href="/shop?category=basic-t-shirt" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Men's Upper</Link></li>
+                <li><Link href="/shop?category=long-shirt" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Women & Kids</Link></li>
+                <li><Link href="/shop?category=hoodie" className="text-zinc-400 hover:text-berry-400 text-sm transition-colors flex items-center gap-2"><span className="w-1 h-1 bg-gold-400 rounded-full"></span>Winter Collection</Link></li>
               </ul>
             </div>
 
@@ -70,30 +69,29 @@ export default function Footer() {
                   <div className="w-8 h-8 rounded-full bg-berry-500/10 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
                     <MapPin size={14} className="text-berry-400" />
                   </div>
-                  <span className="text-zinc-400 text-sm">123 Luxury Avenue, Fashion District, NY 10001</span>
+                  <span className="text-zinc-400 text-sm">Lahore, Punjab, Pakistan</span>
                 </li>
                 <li className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-berry-500/10 flex items-center justify-center mr-3 flex-shrink-0">
                     <Phone size={14} className="text-berry-400" />
                   </div>
-                  <span className="text-zinc-400 text-sm">+1 (800) 123-4567</span>
+                  <span className="text-zinc-400 text-sm">{process.env.NEXT_PUBLIC_CONTACT_PHONE || "+92 300 0000000"}</span>
                 </li>
                 <li className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-berry-500/10 flex items-center justify-center mr-3 flex-shrink-0">
                     <Mail size={14} className="text-berry-400" />
                   </div>
-                  <span className="text-zinc-400 text-sm">support@merryberry.com</span>
+                  <span className="text-zinc-400 text-sm">{process.env.NEXT_PUBLIC_CONTACT_EMAIL || "merryberrytshirts@gmail.com"}</span>
                 </li>
               </ul>
               
               {/* Payment Methods */}
               <div className="mt-6">
                 <p className="text-zinc-500 text-xs mb-3">Secure Payment Methods</p>
-                <div className="flex gap-2">
-                  <div className="px-3 py-1.5 bg-zinc-900 rounded text-xs text-zinc-400 border border-white/10">Visa</div>
-                  <div className="px-3 py-1.5 bg-zinc-900 rounded text-xs text-zinc-400 border border-white/10">MC</div>
-                  <div className="px-3 py-1.5 bg-zinc-900 rounded text-xs text-zinc-400 border border-white/10">PayPal</div>
-                  <div className="px-3 py-1.5 bg-zinc-900 rounded text-xs text-zinc-400 border border-white/10">Apple Pay</div>
+                <div className="flex flex-wrap gap-2">
+                  <div className="px-3 py-1.5 bg-zinc-900 rounded text-[10px] text-zinc-400 border border-white/10 uppercase tracking-tighter">Bank Transfer</div>
+                  <div className="px-3 py-1.5 bg-zinc-900 rounded text-[10px] text-zinc-400 border border-white/10 uppercase tracking-tighter">Digital Wallet</div>
+                  <div className="px-3 py-1.5 bg-zinc-900 rounded text-[10px] text-zinc-400 border border-white/10 uppercase tracking-tighter">Visa/MC</div>
                 </div>
               </div>
             </div>

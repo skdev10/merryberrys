@@ -46,7 +46,8 @@ export async function POST(request) {
                 sizes: JSON.stringify(data.sizes || ['S', 'M', 'L', 'XL']),
                 colors: JSON.stringify(data.colors || ['Black', 'White']),
                 categoryId: data.categoryId,
-                inStock: data.inStock ?? true
+                inStock: data.inStock ?? true,
+                stockQuantity: Math.max(0, parseInt(data.stockQuantity ?? 100, 10) || 0)
             }
         });
 

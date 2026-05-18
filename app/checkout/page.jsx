@@ -4,6 +4,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import LuxuryNavbar from '../../components/LuxuryNavbar';
 import { Check, Truck, CreditCard, ShieldCheck, ChevronRight } from 'lucide-react';
+import { FREE_SHIPPING_THRESHOLD, readCart, summarizeCart, writeCart } from '@/lib/cart';
+import { formatPrice } from '@/lib/currency';
+import { authHeaders, fetchCurrentUser, isLoggedIn } from '@/lib/auth';
+
+const bankName = process.env.NEXT_PUBLIC_BANK_NAME || 'Meezan / HBL supported';
+const bankAccountTitle = process.env.NEXT_PUBLIC_BANK_ACCOUNT_TITLE || 'Merry Berry Pakistan';
+const bankAccountNumber = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER || 'Configure in Vercel';
+const walletTitle = process.env.NEXT_PUBLIC_WALLET_TITLE || 'Merry Berry Pakistan';
+const walletNumber = process.env.NEXT_PUBLIC_WALLET_NUMBER || 'Configure in Vercel';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -17,59 +26,100 @@ export default function CheckoutPage() {
     address: '',
     city: '',
     postalCode: '',
-    country: 'US',
+    country: 'Pakistan',
     phone: '',
     cardNumber: '',
     cardName: '',
     expiryDate: '',
     cvv: '',
+    paymentReference: '',
   });
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    
-    if (!user || !token) {
+    if (!isLoggedIn()) {
       router.push('/login?redirect=/checkout');
       return;
     }
-    
-    setIsLoggedIn(true);
-    const userData = JSON.parse(user);
-    setFormData(prev => ({ ...prev, email: userData.email }));
 
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      const cartItems = JSON.parse(savedCart);
-      if (cartItems.length === 0) {
-        router.push('/cart');
+    (async () => {
+      const userData = await fetchCurrentUser();
+      if (!userData) {
+        router.push('/login?redirect=/checkout');
         return;
       }
-      setCart(cartItems);
-    } else {
+      setIsLoggedIn(true);
+      const parts = (userData.name || '').trim().split(/\s+/);
+      const firstName = parts[0] || '';
+      const lastName = parts.slice(1).join(' ');
+      setFormData((prev) => ({
+        ...prev,
+        email: userData.email,
+        firstName,
+        lastName,
+      }));
+    })();
+
+    const cartItems = readCart();
+    if (cartItems.length === 0) {
       router.push('/cart');
+      return;
     }
+    setCart(cartItems);
   }, [router]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { subtotal, shipping, total } = summarizeCart(cart);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Process order
-      alert('Order placed successfully!');
-      localStorage.removeItem('cart');
-      router.push('/confirmation');
+      setIsSubmitting(true);
+      try {
+        const response = await fetch('/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+          },
+          body: JSON.stringify({
+            cart,
+            address: {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              address: formData.address,
+              city: formData.city,
+              postalCode: formData.postalCode,
+              country: formData.country,
+              phone: formData.phone,
+            },
+            paymentMethod,
+            paymentReference: formData.paymentReference,
+          }),
+        });
+
+        if (response.ok) {
+          alert('Order placed successfully!');
+          writeCart([]);
+          router.push('/confirmation');
+        } else {
+          alert('Failed to place order.');
+        }
+      } catch (error) {
+        console.error('Checkout error:', error);
+        alert('An error occurred during checkout.');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
-
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 200 ? 0 : 15;
-  const total = subtotal + shipping;
 
   if (!isLoggedIn) {
     return (
@@ -235,67 +285,57 @@ export default function CheckoutPage() {
                 {step === 3 && (
                   <div className="bg-luxury-cream p-8">
                     <h2 className="font-serif text-xl text-luxury-black mb-6">Payment Information</h2>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs uppercase tracking-[0.15em] text-luxury-taupe mb-2">
-                          Card Number
-                        </label>
-                        <div className="relative">
-                          <CreditCard size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-luxury-taupe" />
-                          <input
-                            type="text"
-                            name="cardNumber"
-                            placeholder="1234 5678 9012 3456"
-                            value={formData.cardNumber}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 pr-4 py-3 bg-luxury-white border border-luxury-light-gray/20 text-luxury-black focus:outline-none focus:border-luxury-gold transition-colors"
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs uppercase tracking-[0.15em] text-luxury-taupe mb-2">
-                          Cardholder Name
-                        </label>
-                        <input
-                          type="text"
-                          name="cardName"
-                          value={formData.cardName}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-luxury-white border border-luxury-light-gray/20 text-luxury-black focus:outline-none focus:border-luxury-gold transition-colors"
-                          required
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
+                    
+                    <div className="grid gap-4 mb-6 sm:grid-cols-3">
+                      <label className={`flex-1 flex items-center justify-center gap-2 p-4 border cursor-pointer transition-colors ${paymentMethod === 'bank_transfer' ? 'border-luxury-gold bg-luxury-white text-luxury-black' : 'border-luxury-light-gray/20 text-luxury-taupe hover:border-luxury-gold'}`}>
+                        <input type="radio" name="payment_method" value="bank_transfer" checked={paymentMethod === 'bank_transfer'} onChange={() => setPaymentMethod('bank_transfer')} className="hidden" />
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Bank Transfer
+                      </label>
+                      <label className={`flex-1 flex items-center justify-center gap-2 p-4 border cursor-pointer transition-colors ${paymentMethod === 'digital_wallet' ? 'border-luxury-gold bg-luxury-white text-luxury-black' : 'border-luxury-light-gray/20 text-luxury-taupe hover:border-luxury-gold'}`}>
+                        <input type="radio" name="payment_method" value="digital_wallet" checked={paymentMethod === 'digital_wallet'} onChange={() => setPaymentMethod('digital_wallet')} className="hidden" />
+                        <CreditCard size={18} /> JazzCash / Easypaisa
+                      </label>
+                      <label className={`flex-1 flex items-center justify-center gap-2 p-4 border cursor-pointer transition-colors ${paymentMethod === 'cash_on_delivery' ? 'border-luxury-gold bg-luxury-white text-luxury-black' : 'border-luxury-light-gray/20 text-luxury-taupe hover:border-luxury-gold'}`}>
+                        <input type="radio" name="payment_method" value="cash_on_delivery" checked={paymentMethod === 'cash_on_delivery'} onChange={() => setPaymentMethod('cash_on_delivery')} className="hidden" />
+                        Cash on Delivery
+                      </label>
+                    </div>
+
+                    <div className="p-4 border border-luxury-gold/30 bg-luxury-gold/5 text-luxury-black text-sm leading-relaxed">
+                      {paymentMethod === 'bank_transfer' && (
+                        <>
+                          <p className="mb-2 font-medium">Transfer the total amount to the configured bank account:</p>
+                          <p className="font-serif">Bank Name: {bankName}</p>
+                          <p className="font-serif">Account Name: {bankAccountTitle}</p>
+                          <p className="font-serif">Account Number: {bankAccountNumber}</p>
+                        </>
+                      )}
+                      {paymentMethod === 'digital_wallet' && (
+                        <>
+                          <p className="mb-2 font-medium">Pay via JazzCash or Easypaisa, then add the transaction/reference ID below.</p>
+                          <p className="font-serif">Wallet Title: {walletTitle}</p>
+                          <p className="font-serif">Wallet Number: {walletNumber}</p>
+                        </>
+                      )}
+                      {paymentMethod === 'cash_on_delivery' && (
+                        <p className="font-medium">Cash on Delivery is available for eligible Pakistan service areas.</p>
+                      )}
+                      {paymentMethod !== 'cash_on_delivery' && (
+                        <div className="mt-4">
                           <label className="block text-xs uppercase tracking-[0.15em] text-luxury-taupe mb-2">
-                            Expiry Date
+                            Payment Reference / Transaction ID
                           </label>
                           <input
                             type="text"
-                            name="expiryDate"
-                            placeholder="MM/YY"
-                            value={formData.expiryDate}
+                            name="paymentReference"
+                            value={formData.paymentReference}
                             onChange={handleInputChange}
                             className="w-full px-4 py-3 bg-luxury-white border border-luxury-light-gray/20 text-luxury-black focus:outline-none focus:border-luxury-gold transition-colors"
-                            required
+                            placeholder="Enter transfer or wallet reference"
                           />
                         </div>
-                        <div>
-                          <label className="block text-xs uppercase tracking-[0.15em] text-luxury-taupe mb-2">
-                            CVV
-                          </label>
-                          <input
-                            type="text"
-                            name="cvv"
-                            placeholder="123"
-                            value={formData.cvv}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-3 bg-luxury-white border border-luxury-light-gray/20 text-luxury-black focus:outline-none focus:border-luxury-gold transition-colors"
-                            required
-                          />
-                        </div>
-                      </div>
+                      )}
+                      <p className="mt-3 text-luxury-taupe text-xs">Order will ship after payment confirmation.</p>
                     </div>
                   </div>
                 )}
@@ -306,16 +346,18 @@ export default function CheckoutPage() {
                       type="button"
                       onClick={() => setStep(step - 1)}
                       className="btn-luxury-outline"
+                      disabled={isSubmitting}
                     >
                       <span>Back</span>
                     </button>
                   )}
                   <button
                     type="submit"
-                    className={`btn-luxury ${step === 1 ? 'ml-auto' : ''}`}
+                    disabled={isSubmitting}
+                    className={`btn-luxury ${step === 1 ? 'ml-auto' : ''} ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
                   >
                     <span>
-                      {step === 3 ? `Pay $${total.toFixed(2)}` : 'Continue'}
+                      {isSubmitting ? 'Processing...' : (step === 3 ? `Pay ${formatPrice(total)}` : 'Continue')}
                     </span>
                   </button>
                 </div>
@@ -336,7 +378,7 @@ export default function CheckoutPage() {
                         <p className="text-xs text-luxury-taupe">Qty: {item.quantity}</p>
                       </div>
                       <p className="text-sm text-luxury-black">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {formatPrice((Number(item.price) || 0) * (Number(item.quantity) || 1))}
                       </p>
                     </div>
                   ))}
@@ -345,24 +387,24 @@ export default function CheckoutPage() {
                 <div className="border-t border-luxury-light-gray/20 pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-luxury-taupe">Subtotal</span>
-                    <span className="text-luxury-black">${subtotal.toFixed(2)}</span>
+                    <span className="text-luxury-black">{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-luxury-taupe">Shipping</span>
                     <span className="text-luxury-black">
-                      {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
+                      {shipping === 0 ? 'Free' : formatPrice(shipping)}
                     </span>
                   </div>
                   <div className="flex justify-between font-serif text-lg pt-2 border-t border-luxury-light-gray/20">
                     <span className="text-luxury-black">Total</span>
-                    <span className="text-luxury-black">${total.toFixed(2)}</span>
+                    <span className="text-luxury-black">{formatPrice(total)}</span>
                   </div>
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-luxury-light-gray/20 space-y-3">
                   <div className="flex items-center gap-2 text-xs text-luxury-taupe">
                     <Truck size={14} />
-                    <span>Free shipping on orders over $200</span>
+                    <span>Free shipping on orders over {formatPrice(FREE_SHIPPING_THRESHOLD)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-luxury-taupe">
                     <ShieldCheck size={14} />

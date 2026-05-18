@@ -15,6 +15,7 @@ export default function NewProductPage() {
     price: '',
     categoryId: '',
     inStock: true,
+    stockQuantity: '100',
     imageLines: '',
     sizes: 'S, M, L, XL, XXL',
     colors: 'Black, Navy, Grey, White, Olive',
@@ -57,6 +58,7 @@ export default function NewProductPage() {
           description: form.description,
           price: parseFloat(form.price),
           categoryId: form.categoryId,
+          stockQuantity: parseInt(form.stockQuantity, 10) || 0,
           images: images.length ? images : ['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=900&q=80'],
           sizes,
           colors,
@@ -111,6 +113,15 @@ export default function NewProductPage() {
             </option>
           ))}
         </select>
+        <input
+          required
+          type="number"
+          min="0"
+          className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white"
+          placeholder="Stock quantity"
+          value={form.stockQuantity}
+          onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })}
+        />
         <label className="block text-xs text-zinc-500 uppercase tracking-wider">Image URLs (one per line)</label>
         <textarea
           rows={5}

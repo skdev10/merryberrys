@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/password';
+import { createSessionToken } from '@/lib/authServer';
 
 export async function POST(request) {
   try {
@@ -19,7 +20,7 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }
 
-    const token = Buffer.from(`${user.id}:${Date.now()}`).toString('base64');
+    const token = createSessionToken(user.id);
     return NextResponse.json({
       token,
       user: {

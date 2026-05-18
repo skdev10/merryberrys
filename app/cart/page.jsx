@@ -4,6 +4,16 @@ import Link from 'next/link';
 import RemoteImg from '@/components/RemoteImg';
 import { useRouter } from 'next/navigation';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Lock } from 'lucide-react';
+import {
+  FREE_SHIPPING_THRESHOLD,
+  readCart,
+  removeCartItem,
+  summarizeCart,
+  updateCartItemQuantity,
+  writeCart,
+} from '@/lib/cart';
+import { formatPrice } from '@/lib/currency';
+import { AUTH_CHANGED_EVENT, isLoggedIn } from '@/lib/auth';
 
 export default function CartPage() {
   const router = useRouter();
@@ -14,16 +24,11 @@ export default function CartPage() {
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== 'undefined') {
-      const user = localStorage.getItem('user');
-      const token = localStorage.getItem('token');
-      setIsLoggedIn(!!user && !!token);
-
-      const savedCart = localStorage.getItem('cart');
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
-      }
-    }
+    const syncAuth = () => setIsLoggedIn(isLoggedIn());
+    syncAuth();
+    setCart(readCart());
+    window.addEventListener(AUTH_CHANGED_EVENT, syncAuth);
+    return () => window.removeEventListener(AUTH_CHANGED_EVENT, syncAuth);
   }, []);
 
   if (!mounted) {
@@ -37,24 +42,17 @@ export default function CartPage() {
     );
   }
 
-  const updateQuantity = (id, delta) => {
-    const updatedCart = cart.map(item => {
-      if (item.id === id) {
-        const newQuantity = Math.max(1, item.quantity + delta);
-        return { ...item, quantity: newQuantity };
-      }
-      return item;
-    });
+  const updateQuantity = (index, delta) => {
+    const currentQuantity = Number(cart[index]?.quantity) || 1;
+    const updatedCart = updateCartItemQuantity(cart, index, currentQuantity + delta);
     setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event('cart-updated'));
+    writeCart(updatedCart);
   };
 
-  const removeItem = (id) => {
-    const updatedCart = cart.filter(item => item.id !== id);
+  const removeItem = (index) => {
+    const updatedCart = removeCartItem(cart, index);
     setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event('cart-updated'));
+    writeCart(updatedCart);
   };
 
   const handleCheckout = () => {
@@ -65,9 +63,7 @@ export default function CartPage() {
     router.push('/checkout');
   };
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 200 ? 0 : 15;
-  const total = subtotal + shipping;
+  const { subtotal, shipping, total } = summarizeCart(cart);
 
   return (
     <div className="min-h-screen bg-white pt-20">
@@ -86,8 +82,8 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              {cart.map((item) => (
-                <div key={item.id} className="flex gap-4 py-6 border-b">
+              {cart.map((item, index) => (
+                <div key={`${item.id}-${index}`} className="flex gap-4 py-6 border-b">
                   <div className="relative w-24 h-32 bg-gray-100 flex-shrink-0">
                     <RemoteImg
                       src={item.image}
@@ -97,16 +93,21 @@ export default function CartPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <p className="text-gray-500">${item.price}</p>
+                    <p className="text-gray-500">{formatPrice(item.price)}</p>
+                    {(item.size || item.color) && (
+                      <p className="text-sm text-gray-400 mt-1">
+                        {item.size && `Size: ${item.size}`} {item.size && item.color && '|'} {item.color && `Color: ${item.color}`}
+                      </p>
+                    )}
                     <div className="flex items-center gap-2 mt-2">
-                      <button onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 border rounded">
+                      <button onClick={() => updateQuantity(index, -1)} className="w-8 h-8 border rounded">
                         <Minus size={14} className="mx-auto" />
                       </button>
                       <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 border rounded">
+                      <button onClick={() => updateQuantity(index, 1)} className="w-8 h-8 border rounded">
                         <Plus size={14} className="mx-auto" />
                       </button>
-                      <button onClick={() => removeItem(item.id)} className="ml-auto text-red-500">
+                      <button onClick={() => removeItem(index)} className="ml-auto text-red-500">
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -120,16 +121,19 @@ export default function CartPage() {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
                 </div>
                 <div className="flex justify-between font-semibold text-lg border-t pt-2">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{formatPrice(total)}</span>
                 </div>
+                <p className="text-xs text-gray-500">
+                  Free nationwide shipping above {formatPrice(FREE_SHIPPING_THRESHOLD)}.
+                </p>
               </div>
               <button
                 onClick={handleCheckout}

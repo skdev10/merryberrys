@@ -7,13 +7,28 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
+    const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit')) || 100;
     const page = parseInt(searchParams.get('page')) || 1;
     const skip = (page - 1) * limit;
 
-    const where = {};
+    const where = { AND: [] };
     if (category) {
-      where.categoryId = category;
+      where.AND.push({
+        OR: [
+          { categoryId: category },
+          { category: { slug: category } }
+        ]
+      });
+    }
+    if (search) {
+      where.AND.push({
+        OR: [
+          { name: { contains: search } },
+          { description: { contains: search } },
+          { category: { name: { contains: search } } }
+        ]
+      });
     }
 
     const [products, total] = await Promise.all([

@@ -140,8 +140,8 @@ export default function CollectionsPage() {
             <div>
               <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Contact</h3>
               <ul className="space-y-3 text-sm text-luxury-white/60">
-                <li>hello@merryberry.com</li>
-                <li>+1 (800) 123-4567</li>
+                <li>{process.env.NEXT_PUBLIC_CONTACT_EMAIL || "merryberrytshirts@gmail.com"}</li>
+                <li>{process.env.NEXT_PUBLIC_CONTACT_PHONE || "+1 (800) 123-4567"}</li>
                 <li>123 Fashion Avenue<br />New York, NY 10001</li>
               </ul>
             </div>
@@ -152,15 +152,12 @@ export default function CollectionsPage() {
               © 2026 Merry Berry. All rights reserved.
             </p>
             <div className="flex gap-6">
-              {['Instagram', 'Facebook', 'Pinterest'].map((social) => (
-                <Link 
-                  key={social}
-                  href="#"
-                  className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors"
-                >
-                  {social}
-                </Link>
-              ))}
+              <a href={process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/merryberry.pk?igsh=MXZqZWNqcmdwbHFsOQ=="} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors">
+                Instagram
+              </a>
+              <a href={process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com/share/1abt67TZu4/"} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors">
+                Facebook
+              </a>
             </div>
           </div>
         </div>

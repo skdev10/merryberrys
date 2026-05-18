@@ -45,6 +45,7 @@ model Product {
     colors      String   // JSON string of colors
     categoryId  String
     inStock     Boolean  @default(true)
+    stockQuantity Int    @default(100)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
@@ -62,11 +63,13 @@ model Order {
     address       String   // JSON string of shipping address
     paymentMethod String
     isPaid        Boolean  @default(false)
+    paymentStatus String   @default("PENDING") // PENDING, PAID, FAILED, REQUIRES_REVIEW
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
 
     user        User        @relation(fields: [userId], references: [id])
     orderItems  OrderItem[]
+    transactions Transaction[]
 }
 
 model OrderItem {
@@ -92,6 +95,22 @@ model Cart {
 
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+    id          String   @id @default(cuid())
+    orderId     String
+    provider    String
+    method      String
+    amount      Float
+    currency    String   @default("PKR")
+    status      String   @default("PENDING")
+    reference   String?
+    notes       String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Wishlist {

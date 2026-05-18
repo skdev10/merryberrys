@@ -11,7 +11,8 @@ import {
     Ticket,
     ShieldCheck,
     BarChart3,
-    ChevronRight
+    ChevronRight,
+    Layers
 } from "lucide-react"
 import Link from "next/link"
 
@@ -21,6 +22,7 @@ const AdminSidebar = () => {
     const menuItems = [
         { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
         { name: 'Products', href: '/admin/products', icon: Package },
+        { name: 'Categories', href: '/admin/categories', icon: Layers },
         { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
         { name: 'Customers', href: '/admin/customers', icon: Users },
         { name: 'Banners', href: '/admin/banners', icon: ImageIcon },

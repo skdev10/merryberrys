@@ -25,7 +25,7 @@ export default function Navbar() {
       <div className="bg-gradient-to-r from-berry-900 via-berry-800 to-berry-900 text-white text-center py-2 text-sm">
         <p className="flex items-center justify-center gap-2">
           <span className="hidden sm:inline">✨</span>
-          Free Shipping on Orders Over $50 | Use Code <span className="font-bold text-gold-400">MERRY20</span> for 20% Off
+          Free Shipping on Orders Over Rs. 5,000 | Use Code <span className="font-bold text-gold-400">MERRY20</span> for 20% Off
           <span className="hidden sm:inline">✨</span>
         </p>
       </div>
@@ -60,15 +60,29 @@ export default function Navbar() {
                 Shop
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-berry-500 group-hover:w-full transition-all"></span>
               </Link>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[600px] bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-6 grid grid-cols-3 gap-6">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[800px] bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-6 grid grid-cols-4 gap-6 z-50">
                 <div>
                   <h3 className="text-gold-400 font-serif mb-4 text-lg flex items-center gap-2">
                     <span className="w-8 h-8 rounded-full bg-berry-500/20 flex items-center justify-center text-sm">👨</span>
-                    Men
+                    Men's Lower
                   </h3>
                   <ul className="space-y-2">
-                    <li><Link href="/shop/men-lower" className="text-sm text-zinc-400 hover:text-white transition-colors">Lower Body</Link></li>
-                    <li><Link href="/shop/men-upper" className="text-sm text-zinc-400 hover:text-white transition-colors">Upper Body</Link></li>
+                    <li><Link href="/shop?category=baggy-jeans" className="text-sm text-zinc-400 hover:text-white transition-colors">Baggy Jeans</Link></li>
+                    <li><Link href="/shop?category=cargo-jeans" className="text-sm text-zinc-400 hover:text-white transition-colors">Cargo Jeans</Link></li>
+                    <li><Link href="/shop?category=straight-fit" className="text-sm text-zinc-400 hover:text-white transition-colors">Straight Fit</Link></li>
+                    <li><Link href="/shop?category=tracksuit" className="text-sm text-zinc-400 hover:text-white transition-colors">Tracksuit</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-gold-400 font-serif mb-4 text-lg flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-full bg-berry-500/20 flex items-center justify-center text-sm">👕</span>
+                    Men's Upper
+                  </h3>
+                  <ul className="space-y-2">
+                    <li><Link href="/shop?category=basic-t-shirt" className="text-sm text-zinc-400 hover:text-white transition-colors">Basic T Shirt</Link></li>
+                    <li><Link href="/shop?category=polo" className="text-sm text-zinc-400 hover:text-white transition-colors">Polo</Link></li>
+                    <li><Link href="/shop?category=over-sized" className="text-sm text-zinc-400 hover:text-white transition-colors">Over Sized</Link></li>
+                    <li><Link href="/shop?category=grapic-tee" className="text-sm text-zinc-400 hover:text-white transition-colors">Graphic Tee</Link></li>
                   </ul>
                 </div>
                 <div>
@@ -77,8 +91,10 @@ export default function Navbar() {
                     Women & Kids
                   </h3>
                   <ul className="space-y-2">
-                    <li><Link href="/shop/women" className="text-sm text-zinc-400 hover:text-white transition-colors">Women Collection</Link></li>
-                    <li><Link href="/shop/kids" className="text-sm text-zinc-400 hover:text-white transition-colors">Kids Collection</Link></li>
+                    <li><Link href="/shop?category=long-shirt" className="text-sm text-zinc-400 hover:text-white transition-colors">Long Shirt</Link></li>
+                    <li><Link href="/shop?category=night-suit" className="text-sm text-zinc-400 hover:text-white transition-colors">Night Suit</Link></li>
+                    <li><Link href="/shop?category=kids-jeans" className="text-sm text-zinc-400 hover:text-white transition-colors">Kids Jeans</Link></li>
+                    <li><Link href="/shop?category=kids-t-shirts" className="text-sm text-zinc-400 hover:text-white transition-colors">Kids T Shirts</Link></li>
                   </ul>
                 </div>
                 <div>
@@ -87,7 +103,9 @@ export default function Navbar() {
                     Winter
                   </h3>
                   <ul className="space-y-2">
-                    <li><Link href="/shop/winter-collection" className="text-sm text-zinc-400 hover:text-white transition-colors">Winter Collection</Link></li>
+                    <li><Link href="/shop?category=denim-jacket" className="text-sm text-zinc-400 hover:text-white transition-colors">Denim Jacket</Link></li>
+                    <li><Link href="/shop?category=hoddie" className="text-sm text-zinc-400 hover:text-white transition-colors">Hoodie</Link></li>
+                    <li><Link href="/shop?category=puffer-jacket" className="text-sm text-zinc-400 hover:text-white transition-colors">Puffer Jacket</Link></li>
                   </ul>
                 </div>
               </div>

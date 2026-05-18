@@ -42,7 +42,7 @@ Ye guide GoCart / Merry Berry Next.js project ko GitHub par push karne aur Verce
 
    ```env
    DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require"
-   NEXT_PUBLIC_CURRENCY_SYMBOL="$"
+   NEXT_PUBLIC_CURRENCY_SYMBOL="Rs."
    ```
 
    Important: `.env.local`, `.env`, aur real secrets GitHub par commit mat karo. Sirf `.env.example` commit hona chahiye.
@@ -228,7 +228,7 @@ Ye guide GoCart / Merry Berry Next.js project ko GitHub par push karne aur Verce
 
    ```text
    DATABASE_URL = postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
-   NEXT_PUBLIC_CURRENCY_SYMBOL = $
+   NEXT_PUBLIC_CURRENCY_SYMBOL = Rs.
    ```
 
    Tip: Neon/Supabase use kar rahe ho to pooled Postgres URL prefer karo.

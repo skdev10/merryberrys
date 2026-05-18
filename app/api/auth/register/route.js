@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/password';
+import { createSessionToken } from '@/lib/authServer';
 
 export async function POST(request) {
   try {
@@ -24,7 +25,7 @@ export async function POST(request) {
       },
     });
 
-    const token = Buffer.from(`${user.id}:${Date.now()}`).toString('base64');
+    const token = createSessionToken(user.id);
     return NextResponse.json(
       {
         token,

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import { Upload, ShoppingCart, RefreshCw } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 export default function CustomPrint() {
   const [garment, setGarment] = useState('tshirt');
@@ -91,7 +92,7 @@ export default function CustomPrint() {
                 <div className="pt-6 border-t border-white/10 flex justify-between items-center">
                   <div>
                     <p className="text-zinc-400 text-sm">Total Custom Order</p>
-                    <p className="text-gold-400 font-serif text-3xl font-semibold">$89.99</p>
+                    <p className="text-gold-400 font-serif text-3xl font-semibold">{formatPrice(2500)}</p>
                   </div>
                   <button className="bg-berry-600 hover:bg-berry-500 text-white px-8 py-4 rounded font-medium flex items-center transition-colors shadow-[0_0_15px_rgba(218,44,119,0.3)] disabled:opacity-50" disabled={!uploadedDesign}>
                     <ShoppingCart size={18} className="mr-2" /> Add to Cart

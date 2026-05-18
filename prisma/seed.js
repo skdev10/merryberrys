@@ -7,51 +7,30 @@ const prisma = new PrismaClient();
 // Categories structure
 const categories = [
   // Men's Lower
-  { name: 'Pants', slug: 'pants', parent: 'Men - Lower' },
-  { name: 'Straight Fit', slug: 'straight-fit', parent: 'Men - Lower' },
   { name: 'Baggy Jeans', slug: 'baggy-jeans', parent: 'Men - Lower' },
   { name: 'Cargo Jeans', slug: 'cargo-jeans', parent: 'Men - Lower' },
-  { name: 'Eight Pocket Jeans', slug: 'eight-pocket-jeans', parent: 'Men - Lower' },
+  { name: 'Straight Fit', slug: 'straight-fit', parent: 'Men - Lower' },
   { name: 'Tracksuit', slug: 'tracksuit', parent: 'Men - Lower' },
   { name: 'Trouser', slug: 'trouser', parent: 'Men - Lower' },
-  { name: 'Shorts', slug: 'shorts', parent: 'Men - Lower' },
-  { name: 'Under Wears', slug: 'under-wears', parent: 'Men - Lower' },
-  { name: 'Three Quater Shorts', slug: 'three-quater-shorts', parent: 'Men - Lower' },
   
   // Men's Upper
-  { name: 'Full Sleevee T-Shirt', slug: 'full-sleevee-tshirt', parent: 'Men - Upper' },
-  { name: 'Half Sleeve T-Shirt', slug: 'half-sleeve-tshirt', parent: 'Men - Upper' },
   { name: 'Basic T Shirt', slug: 'basic-t-shirt', parent: 'Men - Upper' },
-  { name: 'Dry Fit T-Shirt', slug: 'dry-fit-tshirt', parent: 'Men - Upper' },
-  { name: 'Grapic Tee', slug: 'grapic-tee', parent: 'Men - Upper' },
-  { name: 'Over Sized', slug: 'over-sized', parent: 'Men - Upper' },
-  { name: 'Droup Shoulder', slug: 'droup-shoulder', parent: 'Men - Upper' },
   { name: 'Polo', slug: 'polo', parent: 'Men - Upper' },
-  { name: 'Zipper Polo', slug: 'zipper-polo', parent: 'Men - Upper' },
-  { name: 'Knit Fibric', slug: 'knit-fibric', parent: 'Men - Upper' },
-  { name: 'V Neck Tee', slug: 'v-neck-tee', parent: 'Men - Upper' },
+  { name: 'Over Sized', slug: 'over-sized', parent: 'Men - Upper' },
+  { name: 'Graphic Tee', slug: 'graphic-tee', parent: 'Men - Upper' },
   { name: 'Formal Shirt', slug: 'formal-shirt', parent: 'Men - Upper' },
-  { name: 'Caps', slug: 'caps', parent: 'Men - Upper' },
-  { name: 'Gym Tank Top', slug: 'gym-tank-top', parent: 'Men - Upper' },
   
-  // Women
-  { name: 'Long Shirt', slug: 'long-shirt', parent: 'Women' },
-  { name: 'Night Suit', slug: 'night-suit', parent: 'Women' },
-  
-  // Kids
-  { name: 'Kids Jeans', slug: 'kids-jeans', parent: 'Kids' },
-  { name: 'Kids T Shirts', slug: 'kids-t-shirts', parent: 'Kids' },
+  // Women & Kids
+  { name: 'Long Shirt', slug: 'long-shirt', parent: 'Women & Kids' },
+  { name: 'Night Suit', slug: 'night-suit', parent: 'Women & Kids' },
+  { name: 'Kids Jeans', slug: 'kids-jeans', parent: 'Women & Kids' },
+  { name: 'Kids T Shirts', slug: 'kids-t-shirts', parent: 'Women & Kids' },
   
   // Winter Collection
-  { name: 'Hi Neck', slug: 'hi-neck', parent: 'Winter Collection' },
   { name: 'Denim Jacket', slug: 'denim-jacket', parent: 'Winter Collection' },
-  { name: 'Base Ball', slug: 'base-ball', parent: 'Winter Collection' },
-  { name: 'Hoddie', slug: 'hoddie', parent: 'Winter Collection' },
-  { name: 'Zipper', slug: 'zipper', parent: 'Winter Collection' },
-  { name: 'Parachute Jacket', slug: 'parachute-jacket', parent: 'Winter Collection' },
-  { name: 'Two In One Jacket', slug: 'two-in-one-jacket', parent: 'Winter Collection' },
+  { name: 'Hoodie', slug: 'hoodie', parent: 'Winter Collection' },
   { name: 'Puffer Jacket', slug: 'puffer-jacket', parent: 'Winter Collection' },
-  { name: 'Half Seelve Sweater', slug: 'half-seelve-sweater', parent: 'Winter Collection' },
+  { name: 'Zipper', slug: 'zipper', parent: 'Winter Collection' },
 ];
 
 // Generate products for each category
@@ -71,11 +50,12 @@ function generateProducts(categorySlug, categoryName, imageKeys) {
       name: `${categoryName} ${String.fromCharCode(65 + i - 1)}`,
       slug: `${categorySlug}-${i}`,
       description: `Premium quality ${categoryName.toLowerCase()} crafted with attention to detail. Features comfortable fit and durable construction.`,
-      price: Math.floor(Math.random() * 150) + 50,
+      price: Math.floor(Math.random() * (8000 - 1500) + 1500),
       images,
       sizes,
       colors,
       inStock: true,
+      stockQuantity: Math.floor(Math.random() * (80 - 15) + 15),
     });
   }
   
@@ -89,6 +69,7 @@ async function main() {
   await prisma.cart.deleteMany();
   await prisma.wishlist.deleteMany();
   await prisma.orderItem.deleteMany();
+  await prisma.transaction.deleteMany();
   await prisma.order.deleteMany();
   await prisma.heroSlide.deleteMany();
   await prisma.product.deleteMany();
@@ -107,43 +88,24 @@ async function main() {
 
   // Create products for each category
   const categoryProducts = {
-    'pants': ['pants'],
-    'straight-fit': ['straightFit'],
     'baggy-jeans': ['baggyJeans'],
     'cargo-jeans': ['cargoJeans'],
-    'eight-pocket-jeans': ['eightPocket'],
+    'straight-fit': ['straightFit'],
     'tracksuit': ['tracksuit'],
     'trouser': ['trouser'],
-    'shorts': ['shorts'],
-    'under-wears': ['underwears'],
-    'three-quater-shorts': ['threeQuarter'],
-    'full-sleevee-tshirt': ['fullSleeveTshirt'],
-    'half-sleeve-tshirt': ['halfSleeveTshirt'],
     'basic-t-shirt': ['basicTshirt'],
-    'dry-fit-tshirt': ['dryFit'],
-    'grapic-tee': ['graphicTee'],
-    'over-sized': ['oversized'],
-    'droup-shoulder': ['dropShoulder'],
     'polo': ['polo'],
-    'zipper-polo': ['zipperPolo'],
-    'knit-fibric': ['knitFabric'],
-    'v-neck-tee': ['vNeck'],
+    'over-sized': ['oversized'],
+    'graphic-tee': ['graphicTee'],
     'formal-shirt': ['formalShirt'],
-    'caps': ['caps'],
-    'gym-tank-top': ['gymTank'],
     'long-shirt': ['longShirt'],
     'night-suit': ['nightSuit'],
     'kids-jeans': ['kidsJeans'],
     'kids-t-shirts': ['kidsTshirts'],
-    'hi-neck': ['hiNeck'],
     'denim-jacket': ['denimJacket'],
-    'base-ball': ['baseball'],
-    'hoddie': ['hoodie'],
-    'zipper': ['zipper'],
-    'parachute-jacket': ['parachute'],
-    'two-in-one-jacket': ['twoInOne'],
+    'hoodie': ['hoodie'],
     'puffer-jacket': ['puffer'],
-    'half-seelve-sweater': ['halfSleeveSweater'],
+    'zipper': ['zipper'],
   };
 
   for (const [slug, imageKeys] of Object.entries(categoryProducts)) {

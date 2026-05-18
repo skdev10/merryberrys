@@ -18,6 +18,7 @@ export async function GET(request, context) {
       include: {
         user: true,
         orderItems: { include: { product: true } },
+        transactions: true,
       },
     });
     if (!order) {
@@ -46,6 +47,7 @@ export async function PUT(request, context) {
       include: {
         user: true,
         orderItems: { include: { product: true } },
+        transactions: true,
       },
     });
 

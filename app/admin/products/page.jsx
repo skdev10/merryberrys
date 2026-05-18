@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { formatPrice } from "@/lib/currency"
 
 export default function ProductsPage() {
     const [products, setProducts] = useState([])
@@ -145,17 +146,23 @@ export default function ProductsPage() {
                                             <td className="p-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 bg-zinc-800 rounded-lg overflow-hidden">
-                                                        {product.images && product.images[0] ? (
-                                                            <img 
-                                                                src={product.images[0]} 
-                                                                alt={product.name}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-zinc-600">
-                                                                <Package size={20} />
-                                                            </div>
-                                                        )}
+                                                        {(() => {
+                                                            let images = [];
+                                                            try {
+                                                                images = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
+                                                            } catch(e) {}
+                                                            return images && images[0] ? (
+                                                                <img 
+                                                                    src={images[0]} 
+                                                                    alt={product.name}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-zinc-600">
+                                                                    <Package size={20} />
+                                                                </div>
+                                                            )
+                                                        })()}
                                                     </div>
                                                     <div>
                                                         <p className="text-white font-medium">{product.name}</p>
@@ -169,10 +176,12 @@ export default function ProductsPage() {
                                                 </span>
                                             </td>
                                             <td className="p-4">
-                                                <p className="text-white font-medium">${product.price}</p>
+                                                <p className="text-white font-medium">{formatPrice(product.price)}</p>
                                             </td>
                                             <td className="p-4">
-                                                <p className="text-zinc-400">{product.inStock ? 'In Stock' : 'Out of Stock'}</p>
+                                                <p className="text-zinc-400">
+                                                    {product.inStock ? `${product.stockQuantity ?? 0} units` : 'Out of Stock'}
+                                                </p>
                                             </td>
                                             <td className="p-4">
                                                 <span className={`px-3 py-1 rounded-full text-xs font-medium border ${

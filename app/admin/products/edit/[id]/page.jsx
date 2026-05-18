@@ -18,6 +18,7 @@ export default function EditProductPage() {
     price: '',
     categoryId: '',
     inStock: true,
+    stockQuantity: '',
     imageLines: '',
     sizes: '',
     colors: '',
@@ -46,6 +47,7 @@ export default function EditProductPage() {
           price: String(p.price ?? ''),
           categoryId: p.categoryId || '',
           inStock: !!p.inStock,
+          stockQuantity: String(p.stockQuantity ?? 0),
           imageLines: imgs.join('\n'),
           sizes: (p.sizes || []).join(', '),
           colors: (p.colors || []).join(', '),
@@ -75,6 +77,7 @@ export default function EditProductPage() {
           description: form.description,
           price: parseFloat(form.price),
           categoryId: form.categoryId,
+          stockQuantity: parseInt(form.stockQuantity, 10) || 0,
           images: images.length ? images : ['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=900&q=80'],
           sizes,
           colors,
@@ -138,6 +141,15 @@ export default function EditProductPage() {
             </option>
           ))}
         </select>
+        <input
+          required
+          type="number"
+          min="0"
+          className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white"
+          placeholder="Stock quantity"
+          value={form.stockQuantity}
+          onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })}
+        />
         <label className="block text-xs text-zinc-500 uppercase tracking-wider">Image URLs (one per line)</label>
         <textarea
           rows={6}

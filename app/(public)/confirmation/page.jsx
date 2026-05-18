@@ -3,6 +3,7 @@ import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 export default function ConfirmationPage() {
   const orderNumber = `MB-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -32,11 +33,11 @@ export default function ConfirmationPage() {
             </div>
             <div className="flex justify-between border-b border-zinc-800 pb-4 mb-4">
               <span className="text-zinc-400">Total Amount</span>
-              <span className="text-white font-serif text-xl">$309.97</span>
+              <span className="text-white font-serif text-xl">{formatPrice(0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-zinc-400">Payment Method</span>
-              <span className="text-white">Credit Card ending in 4242</span>
+              <span className="text-white">Payment confirmation sent</span>
             </div>
           </div>
 
