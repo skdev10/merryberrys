@@ -46,7 +46,7 @@ export default function ContactPage() {
                   icon: Phone,
                   title: 'Phone / WhatsApp',
                   value: SITE.phone,
-                  href: `tel:${SITE.phone.replace(/\s/g, '')}`,
+                  href: SITE.whatsapp,
                 },
                 {
                   icon: Mail,

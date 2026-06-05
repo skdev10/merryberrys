@@ -4,25 +4,24 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import RemoteImg from '@/components/RemoteImg';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { DEFAULT_HERO_SLIDES } from '@/lib/heroSlides';
 
-const AUTO_MS = 8000;
+const AUTO_MS = 7000;
 
 export default function HeroCarousel({ slides: initialSlides }) {
-  const [slides, setSlides] = useState(initialSlides || []);
+  const fallback = initialSlides?.length ? initialSlides : DEFAULT_HERO_SLIDES;
+  const [slides, setSlides] = useState(fallback);
   const [index, setIndex] = useState(0);
-  const [ready, setReady] = useState(!!initialSlides?.length);
+  const [ready, setReady] = useState(true);
 
   useEffect(() => {
-    if (initialSlides?.length) {
-      setReady(true);
-      return;
-    }
     fetch('/api/hero-slides', { cache: 'no-store' })
       .then((r) => r.json())
-      .then((d) => setSlides(d.slides || []))
-      .catch(() => setSlides([]))
-      .finally(() => setReady(true));
-  }, [initialSlides]);
+      .then((d) => {
+        if (d.slides?.length) setSlides(d.slides);
+      })
+      .catch(() => {});
+  }, []);
 
   const len = slides.length;
   const current = len ? slides[index % len] : null;

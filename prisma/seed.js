@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const { STOCK_IMAGES: productImages, PLACEHOLDER_IMAGE } = require('../lib/productImages.cjs');
+const { HERO_SLIDES, PRODUCT_NAMES } = require('../lib/catalogData.cjs');
 
 const prisma = new PrismaClient();
 
@@ -38,6 +39,7 @@ function generateProducts(categorySlug, categoryName, imageKeys) {
   const products = [];
   const sizes = JSON.stringify(['S', 'M', 'L', 'XL', 'XXL']);
   const colors = JSON.stringify(['Black', 'Navy', 'Grey', 'White', 'Olive']);
+  const names = PRODUCT_NAMES[categorySlug] || [];
   
   for (let i = 1; i <= 10; i++) {
     const imageKey = imageKeys[(i - 1) % imageKeys.length];
@@ -45,9 +47,10 @@ function generateProducts(categorySlug, categoryName, imageKeys) {
     const primary = pool[(i - 1) % pool.length] || PLACEHOLDER_IMAGE;
     const secondary = pool[i % pool.length] || primary;
     const images = JSON.stringify([primary, secondary]);
+    const realName = names[i - 1] || `${categoryName} ${String.fromCharCode(65 + i - 1)}`;
     
     products.push({
-      name: `${categoryName} ${String.fromCharCode(65 + i - 1)}`,
+      name: realName,
       slug: `${categorySlug}-${i}`,
       description: `Premium quality ${categoryName.toLowerCase()} crafted with attention to detail. Features comfortable fit and durable construction.`,
       price: Math.floor(Math.random() * (8000 - 1500) + 1500),
@@ -60,6 +63,32 @@ function generateProducts(categorySlug, categoryName, imageKeys) {
   }
   
   return products;
+}
+
+async function syncHeroSlides() {
+  await prisma.heroSlide.deleteMany();
+  await prisma.heroSlide.createMany({ data: HERO_SLIDES });
+  console.log(`Synced ${HERO_SLIDES.length} hero slides`);
+}
+
+async function syncProductNames() {
+  let updated = 0;
+  for (const [slug, names] of Object.entries(PRODUCT_NAMES)) {
+    const products = await prisma.product.findMany({
+      where: { slug: { startsWith: `${slug}-` } },
+      orderBy: { slug: 'asc' },
+    });
+    for (let i = 0; i < products.length && i < names.length; i++) {
+      if (products[i].name !== names[i]) {
+        await prisma.product.update({
+          where: { id: products[i].id },
+          data: { name: names[i] },
+        });
+        updated += 1;
+      }
+    }
+  }
+  console.log(`Synced product names (${updated} updated)`);
 }
 
 async function ensureAdminUser() {
@@ -95,7 +124,9 @@ async function main() {
 
   const existingProducts = await prisma.product.count();
   if (existingProducts > 0) {
-    console.log(`Database already has ${existingProducts} products — skipping full seed.`);
+    console.log(`Database already has ${existingProducts} products — syncing catalog.`);
+    await syncHeroSlides();
+    await syncProductNames();
     await ensureAdminUser();
     return;
   }
@@ -161,40 +192,7 @@ async function main() {
     console.log(`Created ${products.length} products for ${category.name}`);
   }
 
-  await prisma.heroSlide.createMany({
-    data: [
-      {
-        imageUrl: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=1920&q=85&auto=format&fit=crop',
-        videoUrl: null,
-        title: 'Wide silhouettes',
-        subtitle: 'New season',
-        ctaLabel: 'Shop streetwear',
-        ctaHref: '/shop',
-        sortOrder: 0,
-        active: true,
-      },
-      {
-        imageUrl: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1920&q=85&auto=format&fit=crop',
-        videoUrl: null,
-        title: 'Denim & layers',
-        subtitle: 'Everyday uniform',
-        ctaLabel: 'View jeans',
-        ctaHref: '/shop',
-        sortOrder: 1,
-        active: true,
-      },
-      {
-        imageUrl: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1920&q=85&auto=format&fit=crop',
-        videoUrl: null,
-        title: 'Build the fit',
-        subtitle: 'Capsule staples',
-        ctaLabel: 'Collections',
-        ctaHref: '/collections',
-        sortOrder: 2,
-        active: true,
-      },
-    ],
-  });
+  await prisma.heroSlide.createMany({ data: HERO_SLIDES });
   console.log('Created hero slides');
 
   await ensureAdminUser();

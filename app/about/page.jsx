@@ -6,7 +6,7 @@ import LuxuryNavbar from '../../components/LuxuryNavbar';
 import Footer from '../../components/Footer';
 import RemoteImg from '@/components/RemoteImg';
 import Reveal from '@/components/Reveal';
-import { ArrowRight, Heart, Scissors, Leaf, Award, Sparkles, Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Heart, Scissors, Leaf, Award, Sparkles, Star, Quote, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from 'lucide-react';
 import { SITE } from '@/lib/site';
 import SocialLinks from '@/components/SocialLinks';
 
@@ -98,8 +98,8 @@ export default function AboutPage() {
         <section className="relative h-[85vh] min-h-[600px] flex items-end overflow-hidden">
           <div className="absolute inset-0">
             <RemoteImg
-              src="https://images.unsplash.com/photo-1558171813-4c088753af8f?w=1600&q=85&auto=format&fit=crop"
-              alt="Merry Berry Atelier"
+              src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1600&q=90&auto=format&fit=crop"
+              alt="Merry Berry premium t-shirts"
               className="absolute inset-0 h-full w-full object-cover hero-ken"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/80 via-luxury-black/30 to-transparent" />
@@ -154,8 +154,8 @@ export default function AboutPage() {
               <Reveal className="relative" style={{ transitionDelay: '0.2s' }}>
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <RemoteImg
-                    src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80&auto=format&fit=crop"
-                    alt="Merry Berry craftsmanship"
+                    src="https://images.unsplash.com/photo-1618354691373-d851c43c8a0a?w=800&q=90&auto=format&fit=crop"
+                    alt="Merry Berry cotton t-shirt craftsmanship"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
@@ -167,6 +167,53 @@ export default function AboutPage() {
                   </p>
                 </div>
               </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact strip */}
+        <section className="bg-luxury-black py-14 md:py-16">
+          <div className="container-luxury">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
+                <div className="w-12 h-12 border border-luxury-gold/40 flex items-center justify-center flex-shrink-0">
+                  <Phone size={20} className="text-luxury-gold" />
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-luxury-white/50 mb-2">Call / WhatsApp</p>
+                  <a href={`tel:${SITE.phone.replace(/\s/g, '')}`} className="font-serif text-xl text-luxury-white hover:text-luxury-gold transition-colors">
+                    {SITE.phone}
+                  </a>
+                  <a
+                    href={SITE.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-sm text-luxury-gold mt-2 hover:underline"
+                  >
+                    Chat on WhatsApp
+                  </a>
+                </div>
+              </div>
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
+                <div className="w-12 h-12 border border-luxury-gold/40 flex items-center justify-center flex-shrink-0">
+                  <Mail size={20} className="text-luxury-gold" />
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-luxury-white/50 mb-2">Email</p>
+                  <a href={`mailto:${SITE.email}`} className="text-luxury-white hover:text-luxury-gold transition-colors break-all">
+                    {SITE.email}
+                  </a>
+                </div>
+              </div>
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
+                <div className="w-12 h-12 border border-luxury-gold/40 flex items-center justify-center flex-shrink-0">
+                  <MapPin size={20} className="text-luxury-gold" />
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-luxury-white/50 mb-2">Location</p>
+                  <p className="text-luxury-white">{SITE.location}</p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -234,8 +281,8 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
               <Reveal className="relative aspect-[4/3] overflow-hidden order-2 lg:order-1">
                 <RemoteImg
-                  src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80&auto=format&fit=crop"
-                  alt="Design and production process"
+                  src="https://images.unsplash.com/photo-1586105256595-7d9c9c4e8c0c?w=800&q=90&auto=format&fit=crop"
+                  alt="T-shirt fabric and stitching process"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
               </Reveal>
@@ -374,8 +421,8 @@ export default function AboutPage() {
               <Reveal className="order-1 lg:order-2 relative" style={{ transitionDelay: '0.2s' }}>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   <RemoteImg
-                    src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80&auto=format&fit=crop"
-                    alt="Merry Berry collection"
+                    src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&q=90&auto=format&fit=crop"
+                    alt="Merry Berry graphic t-shirt collection"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
@@ -465,8 +512,8 @@ export default function AboutPage() {
         <section className="relative h-[70vh] min-h-[500px] flex items-center">
           <div className="absolute inset-0">
             <RemoteImg
-              src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1600&q=80&auto=format&fit=crop"
-              alt="Dress with confidence"
+              src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1600&q=90&auto=format&fit=crop"
+              alt="Merry Berry hoodies and winter wear"
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-luxury-black/50" />
@@ -511,10 +558,12 @@ export default function AboutPage() {
                   <span>Shop Now</span>
                 </Link>
                 <a
-                  href={`mailto:${SITE.email}`}
+                  href={SITE.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="btn-luxury-outline inline-flex items-center justify-center"
                 >
-                  <span>{SITE.email}</span>
+                  <span>{SITE.phone}</span>
                 </a>
               </div>
             </Reveal>
