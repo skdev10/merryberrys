@@ -140,11 +140,6 @@ export default function AdminLogin() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-zinc-500 text-sm">
-              Default: <span className="text-zinc-400">admin@merryberry.com</span> / <span className="text-zinc-400">admin123</span>
-            </p>
-          </div>
         </div>
 
         <div className="mt-8 text-center">

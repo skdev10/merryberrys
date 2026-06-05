@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { adminFetch } from '@/lib/adminClient';
 import { Plus, Trash2, Save } from 'lucide-react';
 
 const emptyForm = {
@@ -23,7 +24,7 @@ export default function AdminBannersPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/hero-slides');
+      const res = await adminFetch('/api/admin/hero-slides');
       const data = await res.json();
       setSlides(data.slides || []);
     } finally {
@@ -44,7 +45,7 @@ export default function AdminBannersPage() {
   const saveSlide = async (slide) => {
     setSavingId(slide.id);
     try {
-      await fetch(`/api/admin/hero-slides/${slide.id}`, {
+      await adminFetch(`/api/admin/hero-slides/${slide.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(slide),
@@ -57,13 +58,13 @@ export default function AdminBannersPage() {
 
   const deleteSlide = async (id) => {
     if (!confirm('Delete this slide?')) return;
-    await fetch(`/api/admin/hero-slides/${id}`, { method: 'DELETE' });
+    await adminFetch(`/api/admin/hero-slides/${id}`, { method: 'DELETE' });
     await load();
   };
 
   const addSlide = async (e) => {
     e.preventDefault();
-    await fetch('/api/admin/hero-slides', {
+    await adminFetch('/api/admin/hero-slides', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),

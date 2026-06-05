@@ -11,22 +11,54 @@ import {
     Calendar
 } from "lucide-react"
 import Link from "next/link"
+import { adminFetch } from '@/lib/adminClient'
+import { formatPrice } from '@/lib/currency'
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
-        products: 370,
-        orders: 24,
-        customers: 156,
-        revenue: 12580,
-        growth: 12.5
+        products: 0,
+        orders: 0,
+        customers: 0,
+        revenue: 0,
+        growth: 0
     })
-    const [recentOrders, setRecentOrders] = useState([
-        { id: '#ORD-001', customer: 'John Doe', product: 'Premium T-Shirt', amount: 89.99, status: 'Completed', date: '2026-04-11' },
-        { id: '#ORD-002', customer: 'Jane Smith', product: 'Winter Jacket', amount: 199.99, status: 'Processing', date: '2026-04-10' },
-        { id: '#ORD-003', customer: 'Mike Johnson', product: 'Cargo Pants', amount: 79.99, status: 'Pending', date: '2026-04-10' },
-        { id: '#ORD-004', customer: 'Sarah Williams', product: 'Hoodie', amount: 129.99, status: 'Completed', date: '2026-04-09' },
-        { id: '#ORD-005', customer: 'David Brown', product: 'Polo Shirt', amount: 59.99, status: 'Shipped', date: '2026-04-09' },
-    ])
+    const [recentOrders, setRecentOrders] = useState([])
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const [productsRes, ordersRes, usersRes] = await Promise.all([
+                    adminFetch('/api/admin/products'),
+                    adminFetch('/api/admin/orders'),
+                    adminFetch('/api/admin/users'),
+                ])
+                const productsData = productsRes.ok ? await productsRes.json() : { products: [] }
+                const ordersData = ordersRes.ok ? await ordersRes.json() : { orders: [] }
+                const usersData = usersRes.ok ? await usersRes.json() : { users: [] }
+                const orders = ordersData.orders || []
+                const revenue = orders.reduce((s, o) => s + Number(o.total || 0), 0)
+                setStats({
+                    products: (productsData.products || []).length,
+                    orders: orders.length,
+                    customers: (usersData.users || []).filter((u) => u.role !== 'admin').length,
+                    revenue,
+                    growth: 0,
+                })
+                setRecentOrders(
+                    orders.slice(0, 5).map((o) => ({
+                        id: `#${o.id.slice(-8)}`,
+                        customer: o.user?.name || o.user?.email || 'Customer',
+                        product: o.orderItems?.[0]?.product?.name || 'Order items',
+                        amount: o.total,
+                        status: o.status,
+                        date: new Date(o.createdAt).toLocaleDateString(),
+                    }))
+                )
+            } catch (e) {
+                console.error('dashboard load', e)
+            }
+        })()
+    }, [])
 
     const statCards = [
         { 
@@ -55,7 +87,7 @@ export default function AdminDashboard() {
         },
         { 
             title: 'Revenue', 
-            value: `$${stats.revenue.toLocaleString()}`, 
+            value: formatPrice(stats.revenue), 
             icon: DollarSign, 
             change: '+15%',
             trend: 'up',
@@ -136,7 +168,7 @@ export default function AdminDashboard() {
                                         <td className="p-4 text-white font-medium">{order.id}</td>
                                         <td className="p-4 text-zinc-400">{order.customer}</td>
                                         <td className="p-4 text-zinc-400">{order.product}</td>
-                                        <td className="p-4 text-white font-medium">${order.amount}</td>
+                                        <td className="p-4 text-white font-medium">{formatPrice(order.amount)}</td>
                                         <td className="p-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                                                 {order.status}

@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { guardAdmin } from '@/lib/requireAdminApi';
 
 // GET single product
 export async function GET(request, context) {
+    const auth = await guardAdmin(request);
+    if (!auth.ok) return auth.response;
     try {
         const { id } = await context.params;
         
@@ -38,6 +41,8 @@ export async function GET(request, context) {
 
 // PUT update product
 export async function PUT(request, context) {
+    const auth = await guardAdmin(request);
+    if (!auth.ok) return auth.response;
     try {
         const { id } = await context.params;
         const data = await request.json();
@@ -70,6 +75,8 @@ export async function PUT(request, context) {
 
 // DELETE product
 export async function DELETE(request, context) {
+    const auth = await guardAdmin(request);
+    if (!auth.ok) return auth.response;
     try {
         const { id } = await context.params;
         

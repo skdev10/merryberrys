@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import LuxuryNavbar from '@/components/LuxuryNavbar';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { isLoggedIn, setAuth } from '@/lib/auth';
 
 function RegisterForm() {
   const router = useRouter();

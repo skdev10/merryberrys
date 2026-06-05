@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { guardAdmin } from '@/lib/requireAdminApi';
 
 function slugify(value) {
   return String(value || '')
@@ -9,7 +10,9 @@ function slugify(value) {
     .replace(/(^-|-$)/g, '');
 }
 
-export async function GET() {
+export async function GET(request) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const categories = await prisma.category.findMany({
       include: { _count: { select: { products: true } } },
@@ -24,6 +27,8 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const body = await request.json();
     const name = String(body.name || '').trim();

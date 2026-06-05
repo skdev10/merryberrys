@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Search, Users } from 'lucide-react';
 import { formatPrice } from '@/lib/currency';
+import { adminFetch } from '@/lib/adminClient';
 
 export default function AdminCustomersPage() {
   const [users, setUsers] = useState([]);
@@ -12,7 +13,7 @@ export default function AdminCustomersPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/admin/users', { cache: 'no-store' });
+        const res = await adminFetch('/api/admin/users', { cache: 'no-store' });
         const data = await res.json();
         setUsers(data.users || []);
       } finally {

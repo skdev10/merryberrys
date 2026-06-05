@@ -1,8 +1,8 @@
 import StoreLayout from "@/components/store/StoreLayout";
 
 export const metadata = {
-    title: "GoCart. - Store Dashboard",
-    description: "GoCart. - Store Dashboard",
+    title: "Merry Berry - Store Dashboard",
+    description: "Merry Berry store dashboard",
 };
 
 export default function RootAdminLayout({ children }) {

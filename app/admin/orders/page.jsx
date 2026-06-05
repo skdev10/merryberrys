@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { formatPrice } from "@/lib/currency"
+import { adminFetch } from '@/lib/adminClient'
 
 export default function OrdersPage() {
     const [orders, setOrders] = useState([])
@@ -26,7 +27,7 @@ export default function OrdersPage() {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch('/api/admin/orders')
+            const response = await adminFetch('/api/admin/orders')
             const data = await response.json()
             setOrders(data.orders || [])
         } catch (error) {
@@ -38,7 +39,7 @@ export default function OrdersPage() {
 
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
-            const response = await fetch(`/api/admin/orders/${orderId}`, {
+            const response = await adminFetch(`/api/admin/orders/${orderId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })

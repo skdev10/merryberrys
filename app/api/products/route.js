@@ -12,24 +12,25 @@ export async function GET(request) {
     const page = parseInt(searchParams.get('page')) || 1;
     const skip = (page - 1) * limit;
 
-    const where = { AND: [] };
+    const filters = [];
     if (category) {
-      where.AND.push({
+      filters.push({
         OR: [
           { categoryId: category },
-          { category: { slug: category } }
-        ]
+          { category: { slug: category } },
+        ],
       });
     }
     if (search) {
-      where.AND.push({
+      filters.push({
         OR: [
           { name: { contains: search } },
           { description: { contains: search } },
-          { category: { name: { contains: search } } }
-        ]
+          { category: { name: { contains: search } } },
+        ],
       });
     }
+    const where = filters.length ? { AND: filters } : {};
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({

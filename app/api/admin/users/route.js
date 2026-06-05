@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { guardAdmin } from '@/lib/requireAdminApi';
 
-export async function GET() {
+export async function GET(request) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const users = await prisma.user.findMany({
       select: {

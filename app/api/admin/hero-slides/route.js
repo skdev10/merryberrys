@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { guardAdmin } from '@/lib/requireAdminApi';
 
-export async function GET() {
+export async function GET(request) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const slides = await prisma.heroSlide.findMany({
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -14,6 +17,8 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const body = await request.json();
     const slide = await prisma.heroSlide.create({

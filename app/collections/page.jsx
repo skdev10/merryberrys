@@ -1,7 +1,10 @@
 'use client';
 import Link from 'next/link';
 import LuxuryNavbar from '../../components/LuxuryNavbar';
+import Footer from '../../components/Footer';
 import RemoteImg from '@/components/RemoteImg';
+import Reveal from '@/components/Reveal';
+import { ArrowRight } from 'lucide-react';
 
 const collections = [
   {
@@ -10,6 +13,7 @@ const collections = [
     description: 'Light, airy pieces for the warm season',
     image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=1200&q=85&auto=format&fit=crop',
     itemCount: 24,
+    href: '/shop?sort=new',
   },
   {
     id: 2,
@@ -17,13 +21,15 @@ const collections = [
     description: 'Elegant pieces for special occasions',
     image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80',
     itemCount: 18,
+    href: '/shop?category=formal-shirt',
   },
   {
     id: 3,
     name: 'Essentials',
     description: 'Timeless staples for every wardrobe',
-    image: 'https://images.unsplash.com/photo-1496745911865-6eaf0df0dc4b?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1496745911865-6eaf0dc4b?w=800&q=80',
     itemCount: 32,
+    href: '/shop?category=basic-t-shirt',
   },
   {
     id: 4,
@@ -31,6 +37,7 @@ const collections = [
     description: 'Cozy luxury for cold days',
     image: 'https://images.unsplash.com/photo-1539533018447-63fcce268581?w=800&q=80',
     itemCount: 28,
+    href: '/shop?category=hoodie',
   },
 ];
 
@@ -38,11 +45,11 @@ export default function CollectionsPage() {
   return (
     <>
       <LuxuryNavbar />
-      
+
       <main className="pt-32 pb-20 bg-luxury-white min-h-screen">
         {/* Header */}
         <div className="container-luxury mb-16">
-          <div className="text-center">
+          <Reveal className="text-center">
             <p className="text-luxury-caption text-luxury-taupe mb-4">Curated For You</p>
             <h1 className="text-luxury-subheading text-luxury-black mb-6">
               Our Collections
@@ -50,17 +57,19 @@ export default function CollectionsPage() {
             <p className="text-luxury-body text-luxury-taupe max-w-2xl mx-auto">
               Explore our thoughtfully curated collections, each designed to bring timeless elegance to your wardrobe.
             </p>
-          </div>
+          </Reveal>
         </div>
 
         {/* Collections Grid */}
         <div className="container-luxury">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {collections.map((collection, index) => (
-              <Link
+              <Reveal
                 key={collection.id}
-                href="/shop"
-                className="group relative aspect-[4/3] overflow-hidden"
+                as={Link}
+                href={collection.href}
+                className="group relative aspect-[4/3] overflow-hidden block"
+                style={{ transitionDelay: `${index * 0.1}s` }}
               >
                 <RemoteImg
                   src={collection.image}
@@ -78,15 +87,18 @@ export default function CollectionsPage() {
                   <p className="text-luxury-white/80">
                     {collection.description}
                   </p>
+                  <div className="mt-4 flex items-center gap-2 text-luxury-gold text-xs uppercase tracking-[0.15em] opacity-100 translate-y-0 transition-all duration-500 md:opacity-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0">
+                    Explore Collection <ArrowRight size={14} />
+                  </div>
                 </div>
-              </Link>
+              </Reveal>
             ))}
           </div>
         </div>
 
         {/* CTA Section */}
         <div className="container-luxury mt-24">
-          <div className="bg-luxury-cream py-16 px-8 text-center">
+          <Reveal className="bg-luxury-cream py-16 px-8 text-center">
             <h2 className="font-serif text-3xl md:text-4xl text-luxury-black mb-4">
               Discover Your Style
             </h2>
@@ -96,72 +108,11 @@ export default function CollectionsPage() {
             <Link href="/shop" className="btn-luxury">
               <span>Shop All</span>
             </Link>
-          </div>
+          </Reveal>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-luxury-black text-luxury-white pt-20 pb-8">
-        <div className="container-luxury">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-            <div className="md:col-span-1">
-              <h2 className="font-serif text-2xl tracking-[0.15em] mb-6">MERRY BERRY</h2>
-              <p className="text-sm text-luxury-white/60 leading-relaxed">
-                Crafting timeless elegance since 2016. Each piece tells a story of meticulous craftsmanship and enduring style.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Shop</h3>
-              <ul className="space-y-3">
-                {['New Arrivals', 'Women', 'Men', 'Accessories', 'Sale'].map((item) => (
-                  <li key={item}>
-                    <Link href="/shop" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Help</h3>
-              <ul className="space-y-3">
-                {['Contact Us', 'Shipping Info', 'Returns', 'Size Guide', 'FAQ'].map((item) => (
-                  <li key={item}>
-                    <Link href="#" className="text-sm text-luxury-white/60 hover:text-luxury-gold transition-colors">
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-6">Contact</h3>
-              <ul className="space-y-3 text-sm text-luxury-white/60">
-                <li>{process.env.NEXT_PUBLIC_CONTACT_EMAIL || "merryberrytshirts@gmail.com"}</li>
-                <li>{process.env.NEXT_PUBLIC_CONTACT_PHONE || "+1 (800) 123-4567"}</li>
-                <li>123 Fashion Avenue<br />New York, NY 10001</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="pt-8 border-t border-luxury-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-luxury-white/40">
-              © 2026 Merry Berry. All rights reserved.
-            </p>
-            <div className="flex gap-6">
-              <a href={process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/merryberry.pk?igsh=MXZqZWNqcmdwbHFsOQ=="} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors">
-                Instagram
-              </a>
-              <a href={process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com/share/1abt67TZu4/"} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-[0.15em] text-luxury-white/40 hover:text-luxury-gold transition-colors">
-                Facebook
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

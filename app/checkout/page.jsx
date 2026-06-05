@@ -6,7 +6,9 @@ import LuxuryNavbar from '../../components/LuxuryNavbar';
 import { Check, Truck, CreditCard, ShieldCheck, ChevronRight } from 'lucide-react';
 import { FREE_SHIPPING_THRESHOLD, readCart, summarizeCart, writeCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/currency';
-import { authHeaders, fetchCurrentUser, isLoggedIn } from '@/lib/auth';
+import { authHeaders, fetchCurrentUser, isLoggedIn as checkLoggedIn } from '@/lib/auth';
+import toast from 'react-hot-toast';
+import Footer from '@/components/Footer';
 
 const bankName = process.env.NEXT_PUBLIC_BANK_NAME || 'Meezan / HBL supported';
 const bankAccountTitle = process.env.NEXT_PUBLIC_BANK_ACCOUNT_TITLE || 'Merry Berry Pakistan';
@@ -18,7 +20,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [cart, setCart] = useState([]);
   const [step, setStep] = useState(1);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -36,7 +38,7 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    if (!isLoggedIn()) {
+    if (!checkLoggedIn()) {
       router.push('/login?redirect=/checkout');
       return;
     }
@@ -47,7 +49,7 @@ export default function CheckoutPage() {
         router.push('/login?redirect=/checkout');
         return;
       }
-      setIsLoggedIn(true);
+      setAuthReady(true);
       const parts = (userData.name || '').trim().split(/\s+/);
       const firstName = parts[0] || '';
       const lastName = parts.slice(1).join(' ');
@@ -106,22 +108,27 @@ export default function CheckoutPage() {
         });
 
         if (response.ok) {
-          alert('Order placed successfully!');
+          const data = await response.json();
+          if (typeof window !== 'undefined' && data.order) {
+            sessionStorage.setItem('lastOrder', JSON.stringify(data.order));
+          }
           writeCart([]);
+          toast.success('Order placed successfully!');
           router.push('/confirmation');
         } else {
-          alert('Failed to place order.');
+          const err = await response.json().catch(() => ({}));
+          toast.error(err.error || 'Failed to place order.');
         }
       } catch (error) {
         console.error('Checkout error:', error);
-        alert('An error occurred during checkout.');
+        toast.error('An error occurred during checkout.');
       } finally {
         setIsSubmitting(false);
       }
     }
   };
 
-  if (!isLoggedIn) {
+  if (!authReady) {
     return (
       <>
         <LuxuryNavbar />
@@ -370,8 +377,8 @@ export default function CheckoutPage() {
                 <h2 className="font-serif text-xl text-luxury-black mb-6">Order Summary</h2>
                 
                 <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex gap-4">
+                  {cart.map((item, index) => (
+                    <div key={`${item.id}-${item.size}-${item.color}-${index}`} className="flex gap-4">
                       <div className="w-16 h-20 bg-luxury-white flex-shrink-0" />
                       <div className="flex-1">
                         <h4 className="text-sm text-luxury-black">{item.name}</h4>
@@ -417,15 +424,7 @@ export default function CheckoutPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-luxury-black text-luxury-white py-12">
-        <div className="container-luxury text-center">
-          <h2 className="font-serif text-2xl tracking-[0.15em] mb-4">MERRY BERRY</h2>
-          <p className="text-sm text-luxury-white/60">
-            © 2026 Merry Berry. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

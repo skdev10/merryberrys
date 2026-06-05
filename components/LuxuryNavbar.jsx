@@ -23,6 +23,7 @@ import {
   isLoggedIn,
 
 } from '@/lib/auth';
+import { CART_STORAGE_KEY } from '@/lib/cart';
 
 
 
@@ -86,7 +87,7 @@ export default function LuxuryNavbar() {
 
     try {
 
-      const raw = localStorage.getItem('cart');
+      const raw = localStorage.getItem(CART_STORAGE_KEY);
 
       const cart = raw ? JSON.parse(raw) : [];
 
@@ -398,11 +399,9 @@ export default function LuxuryNavbar() {
 
               )}
 
-              <button className="hidden lg:block p-2 text-luxury-black hover:text-luxury-gold transition-colors" type="button" aria-label="Wishlist">
-
+              <Link href="/wishlist" className="hidden lg:block p-2 text-luxury-black hover:text-luxury-gold transition-colors" aria-label="Wishlist">
                 <Heart size={20} strokeWidth={1.5} />
-
-              </button>
+              </Link>
 
               <Link
 
@@ -654,11 +653,9 @@ export default function LuxuryNavbar() {
 
               )}
 
-              <button className="flex items-center gap-2 text-sm uppercase tracking-[0.1em]" type="button">
-
+              <Link href="/wishlist" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-sm uppercase tracking-[0.1em]">
                 <Heart size={18} strokeWidth={1.5} /> Wishlist
-
-              </button>
+              </Link>
 
             </div>
 

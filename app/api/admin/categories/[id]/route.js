@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { guardAdmin } from '@/lib/requireAdminApi';
 
 function slugify(value) {
   return String(value || '')
@@ -10,6 +11,8 @@ function slugify(value) {
 }
 
 export async function PUT(request, context) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const { id } = await context.params;
     const body = await request.json();
@@ -34,6 +37,8 @@ export async function PUT(request, context) {
 }
 
 export async function DELETE(request, context) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const { id } = await context.params;
     const productCount = await prisma.product.count({ where: { categoryId: id } });

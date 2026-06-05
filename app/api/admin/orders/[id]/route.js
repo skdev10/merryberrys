@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { guardAdmin } from '@/lib/requireAdminApi';
 
 const ALLOWED_STATUS = new Set([
   'PENDING',
@@ -11,6 +12,8 @@ const ALLOWED_STATUS = new Set([
 ]);
 
 export async function GET(request, context) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const { id } = await context.params;
     const order = await prisma.order.findUnique({
@@ -32,6 +35,8 @@ export async function GET(request, context) {
 }
 
 export async function PUT(request, context) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const { id } = await context.params;
     const body = await request.json();

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { adminFetch } from '@/lib/adminClient';
 import { ArrowLeft } from 'lucide-react';
 
 export default function NewProductPage() {
@@ -49,7 +50,7 @@ export default function NewProductPage() {
         '-' +
         Date.now().toString(36);
 
-      const res = await fetch('/api/admin/products', {
+      const res = await adminFetch('/api/admin/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

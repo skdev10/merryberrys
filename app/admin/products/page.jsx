@@ -13,6 +13,7 @@ import {
 import Link from "next/link"
 import Image from "next/image"
 import { formatPrice } from "@/lib/currency"
+import { adminFetch } from '@/lib/adminClient'
 
 export default function ProductsPage() {
     const [products, setProducts] = useState([])
@@ -26,7 +27,7 @@ export default function ProductsPage() {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('/api/admin/products')
+            const response = await adminFetch('/api/admin/products')
             const data = await response.json()
             setProducts(data.products || [])
         } catch (error) {
@@ -40,7 +41,7 @@ export default function ProductsPage() {
         if (!confirm('Are you sure you want to delete this product?')) return
         
         try {
-            const response = await fetch(`/api/admin/products/${id}`, {
+            const response = await adminFetch(`/api/admin/products/${id}`, {
                 method: 'DELETE'
             })
             if (response.ok) {

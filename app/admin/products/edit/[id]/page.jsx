@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
+import { adminFetch } from '@/lib/adminClient';
 import { ArrowLeft } from 'lucide-react';
 
 export default function EditProductPage() {
@@ -35,7 +36,7 @@ export default function EditProductPage() {
     (async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/admin/products/${id}`);
+        const res = await adminFetch(`/api/admin/products/${id}`);
         const data = await res.json();
         const p = data.product;
         if (!p) return;
@@ -68,7 +69,7 @@ export default function EditProductPage() {
         .filter(Boolean);
       const sizes = form.sizes.split(',').map((s) => s.trim()).filter(Boolean);
       const colors = form.colors.split(',').map((s) => s.trim()).filter(Boolean);
-      await fetch(`/api/admin/products/${id}`, {
+      await adminFetch(`/api/admin/products/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -82,6 +82,11 @@ export default function Footer() {
             <p className="text-zinc-500 text-sm">
               © {new Date().getFullYear()} {SITE.name}. {SITE.tagline}.
             </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm">
+              <Link href="/privacy" className="text-zinc-500 hover:text-white transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-zinc-500 hover:text-white transition-colors">Terms</Link>
+              <Link href="/refund" className="text-zinc-500 hover:text-white transition-colors">Refunds</Link>
+            </div>
             <SocialLinks className="md:hidden" />
           </div>
         </div>

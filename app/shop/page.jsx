@@ -31,6 +31,7 @@ export default function ShopPage() {
         const q = new URLSearchParams(window.location.search);
         if (q.get('category')) initialCat = q.get('category');
         if (q.get('search')) initialSearch = q.get('search');
+        if (q.get('sort') === 'new') setSortBy('Newest');
       }
       await fetchCategories();
       if (initialCat) setSelectedCategory(initialCat);
@@ -74,6 +75,8 @@ export default function ShopPage() {
 
   const filteredProducts = [...products].sort((a, b) => {
     switch(sortBy) {
+      case 'Newest':
+        return new Date(b.createdAt) - new Date(a.createdAt);
       case 'Price: Low to High':
         return a.price - b.price;
       case 'Price: High to Low':

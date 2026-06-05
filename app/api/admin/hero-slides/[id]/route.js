@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { guardAdmin } from '@/lib/requireAdminApi';
 
 export async function PUT(request, context) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const { id } = await context.params;
     const body = await request.json();
@@ -26,6 +29,8 @@ export async function PUT(request, context) {
 }
 
 export async function DELETE(request, context) {
+  const auth = await guardAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
     const { id } = await context.params;
     await prisma.heroSlide.delete({ where: { id } });

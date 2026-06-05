@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { adminFetch } from '@/lib/adminClient';
 import { Plus, Save, Trash2, X } from 'lucide-react';
 
 const parents = ['Men - Lower', 'Men - Upper', 'Women & Kids', 'Winter Collection'];
@@ -23,7 +24,7 @@ export default function AdminCategoriesPage() {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/categories', { cache: 'no-store' });
+      const res = await adminFetch('/api/admin/categories', { cache: 'no-store' });
       const data = await res.json();
       setCategories(data.categories || []);
     } finally {
@@ -49,7 +50,7 @@ export default function AdminCategoriesPage() {
       slug: form.slug || slugify(form.name),
     };
 
-    const res = await fetch(editingId ? `/api/admin/categories/${editingId}` : '/api/admin/categories', {
+    const res = await adminFetch(editingId ? `/api/admin/categories/${editingId}` : '/api/admin/categories', {
       method: editingId ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -77,7 +78,7 @@ export default function AdminCategoriesPage() {
 
   const remove = async (category) => {
     if (!window.confirm(`Delete ${category.name}?`)) return;
-    const res = await fetch(`/api/admin/categories/${category.id}`, { method: 'DELETE' });
+    const res = await adminFetch(`/api/admin/categories/${category.id}`, { method: 'DELETE' });
     const data = await res.json();
     if (!res.ok) {
       setMessage(data.message || 'Failed to delete category');

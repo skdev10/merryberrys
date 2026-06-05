@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Package } from 'lucide-react';
 import { formatPrice } from '@/lib/currency';
+import { adminFetch } from '@/lib/adminClient';
 
 export default function AdminOrderDetailPage() {
   const params = useParams();
@@ -18,7 +19,7 @@ export default function AdminOrderDetailPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/admin/orders/${id}`, { cache: 'no-store' });
+        const res = await adminFetch(`/api/admin/orders/${id}`, { cache: 'no-store' });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Failed to load order');
         if (!cancelled) setOrder(data.order);

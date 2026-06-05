@@ -76,7 +76,7 @@ export default function AccountPage() {
               <p className="text-luxury-taupe">Welcome back, {user.name}</p>
             </div>
             {user.role === 'admin' && (
-              <Link href="/admin/dashboard" className="btn-luxury">
+              <Link href="/admin" className="btn-luxury">
                 <span>Admin Dashboard</span>
               </Link>
             )}
