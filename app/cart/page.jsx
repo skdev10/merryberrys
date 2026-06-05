@@ -1,9 +1,12 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import RemoteImg from '@/components/RemoteImg';
+import LuxuryNavbar from '@/components/LuxuryNavbar';
+import Footer from '@/components/Footer';
 import { useRouter } from 'next/navigation';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Lock } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import {
   FREE_SHIPPING_THRESHOLD,
   readCart,
@@ -13,34 +16,37 @@ import {
   writeCart,
 } from '@/lib/cart';
 import { formatPrice } from '@/lib/currency';
-import { AUTH_CHANGED_EVENT, isLoggedIn } from '@/lib/auth';
+import { AUTH_CHANGED_EVENT, isLoggedIn as checkLoggedIn } from '@/lib/auth';
 
 export default function CartPage() {
   const router = useRouter();
   const [cart, setCart] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    const syncAuth = () => setIsLoggedIn(isLoggedIn());
-    syncAuth();
+  const refreshCart = useCallback(() => {
     setCart(readCart());
-    window.addEventListener(AUTH_CHANGED_EVENT, syncAuth);
-    return () => window.removeEventListener(AUTH_CHANGED_EVENT, syncAuth);
   }, []);
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold text-center mb-8">Shopping Cart</h1>
-          <div className="animate-pulse h-64 bg-gray-100 rounded" />
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    setLoggedIn(checkLoggedIn());
+    refreshCart();
+    setReady(true);
+
+    const onAuth = () => setLoggedIn(checkLoggedIn());
+    const onCart = () => refreshCart();
+
+    window.addEventListener(AUTH_CHANGED_EVENT, onAuth);
+    window.addEventListener('cart-updated', onCart);
+    window.addEventListener('storage', onCart);
+
+    return () => {
+      window.removeEventListener(AUTH_CHANGED_EVENT, onAuth);
+      window.removeEventListener('cart-updated', onCart);
+      window.removeEventListener('storage', onCart);
+    };
+  }, [refreshCart]);
 
   const updateQuantity = (index, delta) => {
     const currentQuantity = Number(cart[index]?.quantity) || 1;
@@ -56,7 +62,7 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    if (!isLoggedIn) {
+    if (!loggedIn) {
       setShowLoginModal(true);
       return;
     }
@@ -65,106 +71,161 @@ export default function CartPage() {
 
   const { subtotal, shipping, total } = summarizeCart(cart);
 
-  return (
-    <div className="min-h-screen bg-white pt-20">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">Shopping Cart</h1>
+  if (!ready) {
+    return (
+      <>
+        <LuxuryNavbar />
+        <div className="flex min-h-screen items-center justify-center bg-luxury-white pt-32">
+          <div className="text-luxury-taupe animate-pulse">Loading cart…</div>
+        </div>
+      </>
+    );
+  }
 
-        {cart.length === 0 ? (
-          <div className="text-center py-20">
-            <ShoppingBag size={64} className="mx-auto mb-6 text-gray-400" />
-            <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
-            <p className="text-gray-500 mb-8">Discover our collection and add items to your cart</p>
-            <Link href="/shop" className="inline-block px-8 py-4 bg-black text-white rounded">
-              Continue Shopping
-            </Link>
+  return (
+    <>
+      <LuxuryNavbar />
+
+      <main className="min-h-screen bg-luxury-white pt-32 pb-20">
+        <div className="container-luxury">
+          <div className="mb-12 text-center">
+            <p className="text-luxury-caption mb-3 text-luxury-taupe">Your Bag</p>
+            <h1 className="font-serif text-4xl text-luxury-black md:text-5xl">Shopping Cart</h1>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              {cart.map((item, index) => (
-                <div key={`${item.id}-${index}`} className="flex gap-4 py-6 border-b">
-                  <div className="relative w-24 h-32 bg-gray-100 flex-shrink-0">
-                    <RemoteImg
-                      src={item.image}
-                      alt={item.name}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <p className="text-gray-500">{formatPrice(item.price)}</p>
-                    {(item.size || item.color) && (
-                      <p className="text-sm text-gray-400 mt-1">
-                        {item.size && `Size: ${item.size}`} {item.size && item.color && '|'} {item.color && `Color: ${item.color}`}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-2 mt-2">
-                      <button onClick={() => updateQuantity(index, -1)} className="w-8 h-8 border rounded">
-                        <Minus size={14} className="mx-auto" />
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(index, 1)} className="w-8 h-8 border rounded">
-                        <Plus size={14} className="mx-auto" />
-                      </button>
-                      <button onClick={() => removeItem(index)} className="ml-auto text-red-500">
-                        <Trash2 size={18} />
-                      </button>
+
+          {cart.length === 0 ? (
+            <div className="border border-luxury-light-gray/20 bg-luxury-cream py-20 text-center">
+              <ShoppingBag size={56} className="mx-auto mb-6 text-luxury-taupe opacity-60" strokeWidth={1} />
+              <h2 className="font-serif mb-4 text-2xl text-luxury-black">Your cart is empty</h2>
+              <p className="mb-8 text-luxury-taupe">Discover our collection and add your favourite pieces.</p>
+              <Link href="/shop" className="btn-luxury inline-flex">
+                <span className="flex items-center gap-2">
+                  Continue Shopping <ArrowRight size={16} />
+                </span>
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+              <div className="lg:col-span-2 space-y-0">
+                {cart.map((item, index) => (
+                  <div
+                    key={`${item.id}-${item.size}-${item.color}-${index}`}
+                    className="flex gap-5 border-b border-luxury-light-gray/20 py-8"
+                  >
+                    <div className="relative h-32 w-24 flex-shrink-0 overflow-hidden bg-luxury-cream">
+                      <RemoteImg
+                        src={item.image}
+                        alt={item.name}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="flex flex-1 flex-col justify-between">
+                      <div>
+                        <h3 className="font-serif text-lg text-luxury-black">{item.name}</h3>
+                        <p className="mt-1 text-sm text-luxury-taupe">{formatPrice(item.price)}</p>
+                        {(item.size || item.color) && (
+                          <p className="mt-1 text-xs text-luxury-taupe">
+                            {item.size && `Size: ${item.size}`}
+                            {item.size && item.color && ' · '}
+                            {item.color && `Color: ${item.color}`}
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-4 flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(index, -1)}
+                          className="flex h-9 w-9 items-center justify-center border border-luxury-light-gray/30 hover:border-luxury-gold"
+                          aria-label="Decrease quantity"
+                        >
+                          <Minus size={14} />
+                        </button>
+                        <span className="min-w-[2rem] text-center text-sm">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(index, 1)}
+                          className="flex h-9 w-9 items-center justify-center border border-luxury-light-gray/30 hover:border-luxury-gold"
+                          aria-label="Increase quantity"
+                        >
+                          <Plus size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(index)}
+                          className="ml-auto text-luxury-taupe hover:text-red-600"
+                          aria-label="Remove item"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-gray-50 p-6 rounded-lg h-fit">
-              <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>{formatPrice(subtotal)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
-                </div>
-                <div className="flex justify-between font-semibold text-lg border-t pt-2">
-                  <span>Total</span>
-                  <span>{formatPrice(total)}</span>
-                </div>
-                <p className="text-xs text-gray-500">
-                  Free nationwide shipping above {formatPrice(FREE_SHIPPING_THRESHOLD)}.
-                </p>
+                ))}
               </div>
-              <button
-                onClick={handleCheckout}
-                className="w-full py-3 bg-black text-white rounded"
-              >
-                {isLoggedIn ? 'Checkout' : 'Login to Checkout'}
-              </button>
+
+              <div className="h-fit border border-luxury-light-gray/20 bg-luxury-cream p-8">
+                <h2 className="font-serif mb-6 text-xl text-luxury-black">Order Summary</h2>
+                <div className="mb-6 space-y-3 text-sm">
+                  <div className="flex justify-between text-luxury-taupe">
+                    <span>Subtotal</span>
+                    <span className="text-luxury-black">{formatPrice(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-luxury-taupe">
+                    <span>Shipping</span>
+                    <span className="text-luxury-black">{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
+                  </div>
+                  <div className="flex justify-between border-t border-luxury-light-gray/20 pt-3 font-serif text-lg text-luxury-black">
+                    <span>Total</span>
+                    <span>{formatPrice(total)}</span>
+                  </div>
+                  <p className="text-xs text-luxury-taupe">
+                    Free nationwide shipping above {formatPrice(FREE_SHIPPING_THRESHOLD)}.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCheckout}
+                  className="btn-luxury w-full"
+                >
+                  <span>{loggedIn ? 'Proceed to Checkout' : 'Login to Checkout'}</span>
+                </button>
+                <Link
+                  href="/shop"
+                  className="mt-4 block text-center text-xs uppercase tracking-[0.15em] text-luxury-taupe hover:text-luxury-gold"
+                >
+                  Continue Shopping
+                </Link>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </main>
+
+      <Footer />
 
       {showLoginModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-8 rounded-lg max-w-md w-full">
-            <h2 className="text-2xl font-semibold mb-4">Login Required</h2>
-            <p className="text-gray-600 mb-6">Please login to proceed with checkout</p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-luxury-black/60 p-4">
+          <div className="w-full max-w-md border border-luxury-light-gray/20 bg-luxury-white p-8">
+            <h2 className="font-serif mb-4 text-2xl text-luxury-black">Sign in required</h2>
+            <p className="mb-6 text-sm text-luxury-taupe">Please sign in to complete your checkout.</p>
             <div className="space-y-3">
-              <Link href="/login" className="block w-full py-3 bg-black text-white text-center rounded">
-                Login
+              <Link
+                href="/login?redirect=/checkout"
+                className="btn-luxury block w-full text-center"
+              >
+                <span>Sign In</span>
               </Link>
               <button
+                type="button"
                 onClick={() => setShowLoginModal(false)}
-                className="block w-full py-3 border rounded"
+                className="btn-luxury-outline w-full"
               >
-                Cancel
+                <span>Cancel</span>
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

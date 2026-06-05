@@ -1,4 +1,5 @@
 import './globals.css'
+import Providers from '@/components/Providers'
 
 export const metadata = {
   title: 'Merry Berry | Premium E-Commerce',
@@ -14,7 +15,7 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
       </head>
       <body className="flex flex-col min-h-screen">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

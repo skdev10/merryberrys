@@ -10,6 +10,8 @@ import { ArrowRight, ArrowDown, Truck, Shield, RefreshCw } from 'lucide-react';
 import { primaryProductImage, parseProductImages } from '@/lib/productImages';
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/cart';
 import { formatPrice } from '@/lib/currency';
+import { addCartItem } from '@/lib/cart';
+import { notifyAddedToCart } from '@/lib/cartNotify';
 
 const collectionImages = [
   {
@@ -40,6 +42,18 @@ const collectionImages = [
 
 export default function LuxuryHome() {
   const [featured, setFeatured] = useState([]);
+
+  const handleAddToCart = (product, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    addCartItem({
+      ...product,
+      image: primaryProductImage(product.images),
+    });
+    notifyAddedToCart(product.name);
+  };
 
   useEffect(() => {
     fetch('/api/products?limit=8', { cache: 'no-store' })
@@ -142,9 +156,13 @@ export default function LuxuryHome() {
                         alt=""
                         className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                        <button className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors">
-                          Quick View
+                      <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-0 opacity-100 transition-all duration-500 md:translate-y-full md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={(e) => handleAddToCart(product, e)}
+                          className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors"
+                        >
+                          Add to Cart
                         </button>
                       </div>
                     </div>

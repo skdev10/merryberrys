@@ -5,10 +5,22 @@ import RemoteImg from './RemoteImg';
 import { primaryProductImage, parseProductImages } from '@/lib/productImages';
 import { formatPrice } from '@/lib/currency';
 import Reveal from '@/components/Reveal';
+import { addCartItem } from '@/lib/cart';
+import { notifyAddedToCart } from '@/lib/cartNotify';
 
 const ProductCard = ({ product }) => {
   const images = parseProductImages(product.images);
   const hoverSrc = images[1] || images[0] || primaryProductImage(product.images);
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addCartItem({
+      ...product,
+      image: primaryProductImage(product.images),
+    });
+    notifyAddedToCart(product.name);
+  };
 
   return (
     <Reveal className="group" data-group>
@@ -24,9 +36,13 @@ const ProductCard = ({ product }) => {
             alt=""
             className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           />
-          <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-            <button className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors">
-              Quick View
+          <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-0 opacity-100 transition-all duration-500 md:translate-y-full md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors"
+            >
+              Add to Cart
             </button>
           </div>
         </div>

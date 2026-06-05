@@ -8,6 +8,7 @@ import { Heart, Truck, Shield, RefreshCw, ChevronLeft, ChevronRight, Star, Shopp
 import { parseProductImages, primaryProductImage, PLACEHOLDER_IMAGE } from '@/lib/productImages';
 import { segmentId } from '@/lib/routeParams';
 import { addCartItem, FREE_SHIPPING_THRESHOLD } from '@/lib/cart';
+import { notifyAddedToCart } from '@/lib/cartNotify';
 import { formatPrice } from '@/lib/currency';
 
 export default function ProductPage() {
@@ -93,7 +94,7 @@ export default function ProductPage() {
       quantity,
       }
     );
-    alert('Added to cart!');
+    notifyAddedToCart(product.name);
   };
 
   const nextImage = () => {
