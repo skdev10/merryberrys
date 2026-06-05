@@ -8,6 +8,7 @@ export default function Providers({ children }) {
       {children}
       <Toaster
         position="top-center"
+        containerStyle={{ zIndex: 99999 }}
         toastOptions={{
           duration: 2800,
           style: {

@@ -15,7 +15,7 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }
 
-    const ok = await verifyPassword(password, user.password);
+    const ok = verifyPassword(password, user.password);
     if (!ok) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }

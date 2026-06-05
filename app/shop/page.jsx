@@ -86,11 +86,7 @@ export default function ShopPage() {
     }
   });
 
-  const handleAddToCart = (product, e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const handleAddToCart = (product) => {
     addCartItem({
       ...product,
       image: primaryProductImage(product.images),
@@ -215,31 +211,29 @@ export default function ShopPage() {
               view === 'grid-3' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'
             }`}>
               {products.map((product) => (
-                <Reveal key={product.id} className="group" data-group>
-                  <Link href={`/product/${product.id}`} className="block group">
+                <Reveal key={product.id} className="group flex flex-col" data-group>
+                  <Link href={`/product/${product.id}`} className="block group flex-1">
                     <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-luxury-cream">
                       <RemoteImg
                         src={primaryProductImage(product.images)}
                         alt={product.name}
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-0 opacity-100 transition-all duration-500 md:translate-y-full md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
-                        <button
-                          type="button"
-                          onClick={(e) => handleAddToCart(product, e)}
-                          className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors"
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
                     </div>
                     <h3 className="font-serif text-lg text-luxury-black mb-1 group-hover:text-luxury-gold transition-colors">
                       {product.name}
                     </h3>
-                    <p className="text-sm text-luxury-taupe">
+                    <p className="text-sm text-luxury-taupe mb-3">
                       {formatPrice(product.price)}
                     </p>
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCart(product)}
+                    className="w-full py-3 bg-luxury-black text-luxury-white text-xs uppercase tracking-[0.15em] hover:bg-luxury-gold transition-colors"
+                  >
+                    Add to Cart
+                  </button>
                 </Reveal>
               ))}
             </div>

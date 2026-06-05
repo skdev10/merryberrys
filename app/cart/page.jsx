@@ -30,9 +30,15 @@ export default function CartPage() {
   }, []);
 
   useEffect(() => {
-    setLoggedIn(checkLoggedIn());
-    refreshCart();
-    setReady(true);
+    try {
+      setLoggedIn(checkLoggedIn());
+      refreshCart();
+    } catch (error) {
+      console.error('Cart init error:', error);
+      setCart([]);
+    } finally {
+      setReady(true);
+    }
 
     const onAuth = () => setLoggedIn(checkLoggedIn());
     const onCart = () => refreshCart();

@@ -113,7 +113,7 @@ async function ensureAdminUser() {
   } else {
     await prisma.user.update({
       where: { email: adminEmail },
-      data: { password: passwordHash, role: 'admin' },
+      data: { password: passwordHash, role: 'admin', name: 'Admin' },
     });
     console.log(`Admin ready: ${adminEmail} / ${adminPassword}`);
   }
