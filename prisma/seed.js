@@ -62,10 +62,45 @@ function generateProducts(categorySlug, categoryName, imageKeys) {
   return products;
 }
 
+async function ensureAdminUser() {
+  const adminEmail = 'admin@merryberry.com';
+  const adminPassword = 'admin123';
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
+
+  const adminExists = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  });
+
+  if (!adminExists) {
+    await prisma.user.create({
+      data: {
+        name: 'Admin',
+        email: adminEmail,
+        password: passwordHash,
+        role: 'admin',
+      },
+    });
+    console.log(`Created admin user: ${adminEmail} / ${adminPassword}`);
+  } else {
+    await prisma.user.update({
+      where: { email: adminEmail },
+      data: { password: passwordHash, role: 'admin' },
+    });
+    console.log(`Admin ready: ${adminEmail} / ${adminPassword}`);
+  }
+}
+
 async function main() {
   console.log('Start seeding...');
 
-  // Clear existing data
+  const existingProducts = await prisma.product.count();
+  if (existingProducts > 0) {
+    console.log(`Database already has ${existingProducts} products — skipping full seed.`);
+    await ensureAdminUser();
+    return;
+  }
+
+  // Clear existing data (fresh seed only)
   await prisma.cart.deleteMany();
   await prisma.wishlist.deleteMany();
   await prisma.orderItem.deleteMany();
@@ -162,31 +197,7 @@ async function main() {
   });
   console.log('Created hero slides');
 
-  const adminEmail = 'admin@merryberry.com';
-  const adminPassword = 'admin123';
-  const passwordHash = await bcrypt.hash(adminPassword, 10);
-
-  const adminExists = await prisma.user.findUnique({
-    where: { email: adminEmail },
-  });
-
-  if (!adminExists) {
-    await prisma.user.create({
-      data: {
-        name: 'Admin',
-        email: adminEmail,
-        password: passwordHash,
-        role: 'admin',
-      },
-    });
-    console.log(`Created admin user: ${adminEmail} / ${adminPassword}`);
-  } else {
-    await prisma.user.update({
-      where: { email: adminEmail },
-      data: { password: passwordHash, role: 'admin' },
-    });
-    console.log(`Updated admin password: ${adminEmail} / ${adminPassword}`);
-  }
+  await ensureAdminUser();
 
   console.log('Seeding finished.');
 }
