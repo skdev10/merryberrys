@@ -21,10 +21,13 @@ git push origin main
 2. Import your GitHub repo (`merryberrys` or your fork)
 3. **Root directory:** leave empty (project root has `package.json`)
 4. **Framework:** Next.js (auto-detected)
-5. **Build command:** `npm run vercel-build` (set in `vercel.json`)
-6. **Do not** deploy yet — add environment variables first.
+5. **Do not deploy yet** — add `DATABASE_URL` first (step 3).
 
-## 3. Environment variables (Vercel → Settings → Environment Variables)
+## 3. Environment variables (required before deploy)
+
+Vercel → your project → **Settings** → **Environment Variables**
+
+**Add `DATABASE_URL` first** (Production + Preview). Without it the site builds but the shop/API will not work.
 
 | Variable | Required | Example |
 |----------|----------|---------|
@@ -44,18 +47,21 @@ Apply to **Production** (and Preview if you use a separate preview database).
 
 ## 4. Deploy
 
-Click **Deploy**. The build will:
+Click **Deploy**. Build runs `prisma generate` + `next build` (no database needed at build time).
 
-- Run `prisma generate`
-- Run `prisma db push` (creates tables on your Postgres DB)
-- Run `next build`
+## 5. Create tables + seed (one time, after deploy)
 
-## 5. Seed products (one time, after first successful deploy)
-
-On your PC (with the same `DATABASE_URL` as Vercel):
+On your PC, use the **same** `DATABASE_URL` as Vercel:
 
 ```bash
-# In project folder — set DATABASE_URL to your Neon/Supabase URL
+# Copy .env.example to .env and paste your Neon/Supabase URL
+npm run db:push
+npm run db:seed
+```
+
+Or:
+
+```bash
 npx prisma db push
 node prisma/seed.js
 ```
@@ -77,7 +83,8 @@ This adds **18 categories**, **180 products**, and admin user:
 
 | Problem | Fix |
 |---------|-----|
-| Build fails on Prisma | Check `DATABASE_URL` is PostgreSQL and set before deploy |
+| Build fails `DATABASE_URL not found` | Pull latest code (build no longer needs DB). For runtime, still add `DATABASE_URL` in Vercel env vars |
+| Build fails on Prisma | Ensure `DATABASE_URL` is PostgreSQL (`postgresql://...`) in Vercel for **runtime** |
 | Shop empty | Run `node prisma/seed.js` against production `DATABASE_URL` |
 | Images missing | Hard refresh; ensure seed ran (Unsplash URLs in DB) |
 | Admin 401 | Use seeded admin email/password |
