@@ -8,6 +8,7 @@ import { primaryProductImage } from '@/lib/productImages';
 import { addCartItem } from '@/lib/cart';
 import { formatPrice } from '@/lib/currency';
 import Reveal from '@/components/Reveal';
+import Footer from '@/components/Footer';
 
 const sortOptions = ['Featured', 'Newest', 'Price: Low to High', 'Price: High to Low'];
 
@@ -295,15 +296,7 @@ export default function ShopPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-luxury-black text-luxury-white py-12">
-        <div className="container-luxury text-center">
-          <h2 className="font-serif text-2xl tracking-[0.15em] mb-4">MERRY BERRY</h2>
-          <p className="text-sm text-luxury-white/60">
-            © 2026 Merry Berry. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

@@ -49,22 +49,25 @@ Apply to **Production** (and Preview if you use a separate preview database).
 
 Click **Deploy**. Build runs `prisma generate` + `next build` (no database needed at build time).
 
-## 5. Create tables + seed (one time, after deploy)
+## 5. Create tables + seed (one time — **required for products on live site**)
 
-On your PC, use the **same** `DATABASE_URL` as Vercel:
+**Option A — from your PC** (same `DATABASE_URL` as Vercel):
 
 ```bash
-# Copy .env.example to .env and paste your Neon/Supabase URL
 npm run db:push
 npm run db:seed
 ```
 
-Or:
+**Option B — from browser** (after redeploy):
 
-```bash
-npx prisma db push
-node prisma/seed.js
-```
+1. Vercel → Environment Variables → add `SETUP_SECRET` = any long password (e.g. `merryberry2026setup`)
+2. Redeploy
+3. Open: `https://YOUR-SITE.vercel.app/api/setup/status` — if `products: 0`, run seed:
+4. Use [Postman](https://postman.com) or terminal:
+   ```bash
+   curl -X POST https://YOUR-SITE.vercel.app/api/setup/seed -H "x-setup-secret: merryberry2026setup"
+   ```
+5. Check again: `/api/setup/status` should show `products: 180`
 
 This adds **18 categories**, **180 products**, and admin user:
 

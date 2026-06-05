@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { Mail, MapPin, Phone, Send } from 'lucide-react';
 import LuxuryNavbar from '@/components/LuxuryNavbar';
 import Footer from '@/components/Footer';
-
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'merryberrytshirts@gmail.com';
-const contactPhone = process.env.NEXT_PUBLIC_CONTACT_PHONE || '+92 300 0000000';
+import SocialLinks from '@/components/SocialLinks';
+import { SITE } from '@/lib/site';
 
 export default function ContactPage() {
   const [status, setStatus] = useState('');
@@ -28,10 +27,11 @@ export default function ContactPage() {
             <h1 className="font-serif mb-6 text-5xl text-luxury-black md:text-6xl">
               We are here to help across Pakistan.
             </h1>
-            <p className="text-luxury-body text-luxury-taupe">
+            <p className="text-luxury-body text-luxury-taupe mb-6">
               Questions about sizing, custom printing, delivery, payments, or wholesale orders?
               Message our Lahore-based team and we will guide you quickly.
             </p>
+            <SocialLinks />
           </div>
 
           <div className="grid gap-10 lg:grid-cols-3">
@@ -45,18 +45,26 @@ export default function ContactPage() {
                 {
                   icon: Phone,
                   title: 'Phone / WhatsApp',
-                  value: contactPhone,
+                  value: SITE.phone,
+                  href: `tel:${SITE.phone.replace(/\s/g, '')}`,
                 },
                 {
                   icon: Mail,
                   title: 'Email',
-                  value: contactEmail,
+                  value: SITE.email,
+                  href: `mailto:${SITE.email}`,
                 },
               ].map((item) => (
                 <div key={item.title} className="border border-luxury-light-gray/20 bg-luxury-cream p-6">
                   <item.icon className="mb-4 text-luxury-gold" size={24} strokeWidth={1.5} />
                   <h2 className="font-serif mb-2 text-xl text-luxury-black">{item.title}</h2>
-                  <p className="text-sm text-luxury-taupe">{item.value}</p>
+                  {item.href ? (
+                    <a href={item.href} className="text-sm text-luxury-taupe hover:text-luxury-gold transition-colors break-all">
+                      {item.value}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-luxury-taupe">{item.value}</p>
+                  )}
                 </div>
               ))}
             </div>
