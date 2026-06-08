@@ -14,34 +14,54 @@ const ABOUT_IMAGE = '/images/about-premium-tshirt.png';
 
 /* ─── Animated counter for stats ─── */
 function AnimatedCounter({ target, suffix = '', duration = 2000 }) {
-  const [count, setCount] = useState(0);
+  const numTarget = parseInt(String(target).replace(/[^0-9]/g, ''), 10) || 0;
+  const [count, setCount] = useState(numTarget);
   const ref = useRef(null);
   const started = useRef(false);
 
   useEffect(() => {
+    const el = ref.current;
+    if (!el || started.current) return;
+
+    const run = () => {
+      if (started.current) return;
+      started.current = true;
+      setCount(0);
+      const increment = numTarget / (duration / 16);
+      let current = 0;
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= numTarget) {
+          setCount(numTarget);
+          clearInterval(timer);
+        } else {
+          setCount(Math.floor(current));
+        }
+      }, 16);
+    };
+
+    if (typeof IntersectionObserver === 'undefined') {
+      run();
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const numTarget = parseInt(target.replace(/[^0-9]/g, ''), 10) || 0;
-          const increment = numTarget / (duration / 16);
-          let current = 0;
-          const timer = setInterval(() => {
-            current += increment;
-            if (current >= numTarget) {
-              setCount(numTarget);
-              clearInterval(timer);
-            } else {
-              setCount(Math.floor(current));
-            }
-          }, 16);
-        }
+        if (entry.isIntersecting) run();
       },
-      { threshold: 0.3 }
+      { threshold: 0.15, rootMargin: '0px 0px -10% 0px' }
     );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [target, duration]);
+    observer.observe(el);
+
+    const fallback = setTimeout(() => {
+      if (!started.current) setCount(numTarget);
+    }, 3000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallback);
+    };
+  }, [numTarget, duration]);
 
   return (
     <span ref={ref}>
@@ -97,33 +117,33 @@ export default function AboutPage() {
         {/* ═══════════════════════════════════════════
             HERO — Full-bleed cinematic header
         ═══════════════════════════════════════════ */}
-        <section className="relative h-[85vh] min-h-[600px] flex items-end overflow-hidden">
+        <section className="about-hero-banner relative flex min-h-[520px] h-[72vh] sm:h-[78vh] md:h-[85vh] md:min-h-[600px] items-end overflow-hidden">
           <div className="absolute inset-0">
             <RemoteImg
-              src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=90&auto=format&fit=crop"
-              alt="Merry Berry fashion atelier"
-              className="absolute inset-0 h-full w-full object-cover hero-ken"
+              src={ABOUT_IMAGE}
+              alt="Merry Berry premium men's solid color t-shirt"
+              className="absolute inset-0 h-full w-full object-cover object-center md:object-[center_30%] hero-ken"
+              priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/80 via-luxury-black/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/90 via-luxury-black/45 to-luxury-black/15 md:from-luxury-black/80 md:via-luxury-black/30 md:to-transparent" />
           </div>
-          <div className="container-luxury relative z-10 pb-20 md:pb-28">
+          <div className="container-luxury relative z-10 w-full pb-12 pt-28 sm:pb-16 sm:pt-32 md:pb-28 md:pt-0">
             <p
-              className="text-luxury-caption text-luxury-gold mb-6 hero-text-enter"
+              className="text-luxury-caption text-luxury-gold mb-4 sm:mb-6 hero-text-enter"
               style={{ animationDelay: '0.2s' }}
             >
               Est. 2019 — Karachi, Pakistan
             </p>
             <h1
-              className="font-serif text-5xl md:text-7xl lg:text-8xl text-luxury-white leading-[0.95] mb-8 hero-text-enter"
+              className="font-serif text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-luxury-white leading-[1.05] mb-5 sm:mb-8 hero-text-enter max-w-4xl"
               style={{ animationDelay: '0.5s' }}
             >
-              Crafting<br />
-              <span className="italic font-light">Confidence,</span><br />
-              One Stitch<br className="hidden md:block" />
-              at a Time
+              Premium<br />
+              <span className="italic font-light">Men&apos;s T-Shirts</span><br />
+              <span className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-light">Dress with Confidence</span>
             </h1>
             <p
-              className="text-luxury-white/70 text-lg md:text-xl max-w-xl leading-relaxed hero-text-enter"
+              className="text-luxury-white/80 text-base sm:text-lg md:text-xl max-w-xl leading-relaxed hero-text-enter"
               style={{ animationDelay: '0.8s' }}
             >
               {SITE.welcomeTitle}
@@ -156,13 +176,13 @@ export default function AboutPage() {
               <Reveal className="relative" style={{ transitionDelay: '0.2s' }}>
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <RemoteImg
-                    src={ABOUT_IMAGE}
-                    alt="Merry Berry premium men's t-shirt collection"
+                    src="https://images.unsplash.com/photo-1618354691373-d851c43c8a0a?w=800&q=90&auto=format&fit=crop"
+                    alt="Merry Berry craftsmanship and quality fabrics"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
                 {/* Floating accent card */}
-                <div className="absolute -bottom-8 -left-8 bg-luxury-black text-luxury-white p-8 max-w-[260px] hidden md:block">
+                <div className="mt-6 bg-luxury-black text-luxury-white p-6 sm:p-8 max-w-full md:absolute md:-bottom-8 md:-left-8 md:mt-0 md:max-w-[260px]">
                   <p className="font-serif text-4xl text-luxury-gold mb-2">5+</p>
                   <p className="text-xs uppercase tracking-[0.2em] text-luxury-white/60">
                     Years of dedicated craftsmanship in Pakistan
@@ -511,7 +531,7 @@ export default function AboutPage() {
         {/* ═══════════════════════════════════════════
             BRAND PROMISE — Full-bleed image + text
         ═══════════════════════════════════════════ */}
-        <section className="relative h-[70vh] min-h-[500px] flex items-center">
+        <section className="relative flex min-h-[420px] h-[60vh] sm:h-[65vh] md:h-[70vh] md:min-h-[500px] items-center">
           <div className="absolute inset-0">
             <RemoteImg
               src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1600&q=90&auto=format&fit=crop"
