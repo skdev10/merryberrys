@@ -10,6 +10,8 @@ import { ArrowRight, Heart, Scissors, Leaf, Award, Sparkles, Star, Quote, Chevro
 import { SITE } from '@/lib/site';
 import SocialLinks from '@/components/SocialLinks';
 
+const ABOUT_IMAGE = '/images/about-premium-tshirt.png';
+
 /* ─── Animated counter for stats ─── */
 function AnimatedCounter({ target, suffix = '', duration = 2000 }) {
   const [count, setCount] = useState(0);
@@ -98,8 +100,8 @@ export default function AboutPage() {
         <section className="relative h-[85vh] min-h-[600px] flex items-end overflow-hidden">
           <div className="absolute inset-0">
             <RemoteImg
-              src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1600&q=90&auto=format&fit=crop"
-              alt="Merry Berry premium t-shirts"
+              src={ABOUT_IMAGE}
+              alt="Merry Berry premium men's solid color t-shirt"
               className="absolute inset-0 h-full w-full object-cover hero-ken"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/80 via-luxury-black/30 to-transparent" />
@@ -109,7 +111,7 @@ export default function AboutPage() {
               className="text-luxury-caption text-luxury-gold mb-6 hero-text-enter"
               style={{ animationDelay: '0.2s' }}
             >
-              Est. 2019 — Lahore, Pakistan
+              Est. 2019 — Karachi, Pakistan
             </p>
             <h1
               className="font-serif text-5xl md:text-7xl lg:text-8xl text-luxury-white leading-[0.95] mb-8 hero-text-enter"
@@ -154,8 +156,8 @@ export default function AboutPage() {
               <Reveal className="relative" style={{ transitionDelay: '0.2s' }}>
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <RemoteImg
-                    src="https://images.unsplash.com/photo-1618354691373-d851c43c8a0a?w=800&q=90&auto=format&fit=crop"
-                    alt="Merry Berry cotton t-shirt craftsmanship"
+                    src={ABOUT_IMAGE}
+                    alt="Merry Berry premium men's t-shirt collection"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
@@ -235,7 +237,7 @@ export default function AboutPage() {
                 {
                   icon: Scissors,
                   title: 'Master Craftsmanship',
-                  description: 'Our Lahore-based tailors bring decades of expertise to every garment. Each piece is cut, stitched, and finished by hand with painstaking attention to detail.',
+                  description: 'Our Karachi-based tailors bring decades of expertise to every garment. Each piece is cut, stitched, and finished by hand with painstaking attention to detail.',
                 },
                 {
                   icon: Heart,
@@ -281,8 +283,8 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
               <Reveal className="relative aspect-[4/3] overflow-hidden order-2 lg:order-1">
                 <RemoteImg
-                  src="https://images.unsplash.com/photo-1586105256595-7d9c9c4e8c0c?w=800&q=90&auto=format&fit=crop"
-                  alt="T-shirt fabric and stitching process"
+                  src={ABOUT_IMAGE}
+                  alt="Merry Berry t-shirt production"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
               </Reveal>
@@ -308,7 +310,7 @@ export default function AboutPage() {
                     {
                       step: '03',
                       title: 'Artisanal Production',
-                      desc: 'Our Lahore production unit houses over 50 skilled artisans who bring each design to life with precision stitching and hand-finishing.',
+                      desc: 'Our Karachi production unit houses over 50 skilled artisans who bring each design to life with precision stitching and hand-finishing.',
                     },
                     {
                       step: '04',
@@ -421,8 +423,8 @@ export default function AboutPage() {
               <Reveal className="order-1 lg:order-2 relative" style={{ transitionDelay: '0.2s' }}>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   <RemoteImg
-                    src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&q=90&auto=format&fit=crop"
-                    alt="Merry Berry graphic t-shirt collection"
+                    src={ABOUT_IMAGE}
+                    alt="Merry Berry premium t-shirt"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
@@ -512,8 +514,8 @@ export default function AboutPage() {
         <section className="relative h-[70vh] min-h-[500px] flex items-center">
           <div className="absolute inset-0">
             <RemoteImg
-              src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1600&q=90&auto=format&fit=crop"
-              alt="Merry Berry hoodies and winter wear"
+              src={ABOUT_IMAGE}
+              alt="Merry Berry premium men's solid color t-shirt"
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-luxury-black/50" />

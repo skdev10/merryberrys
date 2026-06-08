@@ -29,7 +29,7 @@ export default function ContactPage() {
             </h1>
             <p className="text-luxury-body text-luxury-taupe mb-6">
               Questions about sizing, custom printing, delivery, payments, or wholesale orders?
-              Message our Lahore-based team and we will guide you quickly.
+              Message our Karachi-based team and we will guide you quickly.
             </p>
             <SocialLinks />
           </div>
@@ -40,7 +40,7 @@ export default function ContactPage() {
                 {
                   icon: MapPin,
                   title: 'Location',
-                  value: 'Lahore, Punjab, Pakistan',
+                  value: SITE.location,
                 },
                 {
                   icon: Phone,
