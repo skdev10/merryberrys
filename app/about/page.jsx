@@ -100,8 +100,8 @@ export default function AboutPage() {
         <section className="relative h-[85vh] min-h-[600px] flex items-end overflow-hidden">
           <div className="absolute inset-0">
             <RemoteImg
-              src={ABOUT_IMAGE}
-              alt="Merry Berry premium men's solid color t-shirt"
+              src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=90&auto=format&fit=crop"
+              alt="Merry Berry fashion atelier"
               className="absolute inset-0 h-full w-full object-cover hero-ken"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/80 via-luxury-black/30 to-transparent" />
@@ -283,7 +283,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
               <Reveal className="relative aspect-[4/3] overflow-hidden order-2 lg:order-1">
                 <RemoteImg
-                  src={ABOUT_IMAGE}
+                  src="https://images.unsplash.com/photo-1586105256595-7d9c9c4e8c0c?w=800&q=90&auto=format&fit=crop"
                   alt="Merry Berry t-shirt production"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
@@ -423,8 +423,8 @@ export default function AboutPage() {
               <Reveal className="order-1 lg:order-2 relative" style={{ transitionDelay: '0.2s' }}>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   <RemoteImg
-                    src={ABOUT_IMAGE}
-                    alt="Merry Berry premium t-shirt"
+                    src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=90&auto=format&fit=crop"
+                    alt="Merry Berry winter collection"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
@@ -514,8 +514,8 @@ export default function AboutPage() {
         <section className="relative h-[70vh] min-h-[500px] flex items-center">
           <div className="absolute inset-0">
             <RemoteImg
-              src={ABOUT_IMAGE}
-              alt="Merry Berry premium men's solid color t-shirt"
+              src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1600&q=90&auto=format&fit=crop"
+              alt="Merry Berry streetwear"
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-luxury-black/50" />

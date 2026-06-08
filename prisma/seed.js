@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
-const { STOCK_IMAGES: productImages, PLACEHOLDER_IMAGE } = require('../lib/productImages.cjs');
+const { pickProductImages } = require('../lib/productImages.cjs');
 const { HERO_SLIDES, PRODUCT_NAMES } = require('../lib/catalogData.cjs');
 
 const prisma = new PrismaClient();
@@ -42,11 +42,7 @@ function generateProducts(categorySlug, categoryName, imageKeys) {
   const names = PRODUCT_NAMES[categorySlug] || [];
   
   for (let i = 1; i <= 10; i++) {
-    const imageKey = imageKeys[(i - 1) % imageKeys.length];
-    const pool = productImages[imageKey] || productImages.basicTshirt;
-    const primary = pool[(i - 1) % pool.length] || PLACEHOLDER_IMAGE;
-    const secondary = pool[i % pool.length] || primary;
-    const images = JSON.stringify([primary, secondary]);
+    const images = pickProductImages(imageKeys, i - 1);
     const realName = names[i - 1] || `${categoryName} ${String.fromCharCode(65 + i - 1)}`;
     
     products.push({
@@ -69,6 +65,48 @@ async function syncHeroSlides() {
   await prisma.heroSlide.deleteMany();
   await prisma.heroSlide.createMany({ data: HERO_SLIDES });
   console.log(`Synced ${HERO_SLIDES.length} hero slides`);
+}
+
+const CATEGORY_IMAGE_KEYS = {
+  'baggy-jeans': ['baggyJeans'],
+  'cargo-jeans': ['cargoJeans'],
+  'straight-fit': ['straightFit'],
+  'tracksuit': ['tracksuit'],
+  'trouser': ['trouser'],
+  'basic-t-shirt': ['basicTshirt'],
+  'polo': ['polo'],
+  'over-sized': ['oversized'],
+  'graphic-tee': ['graphicTee'],
+  'formal-shirt': ['formalShirt'],
+  'long-shirt': ['longShirt'],
+  'night-suit': ['nightSuit'],
+  'kids-jeans': ['kidsJeans'],
+  'kids-t-shirts': ['kidsTshirts'],
+  'denim-jacket': ['denimJacket'],
+  'hoodie': ['hoodie'],
+  'puffer-jacket': ['puffer'],
+  'zipper': ['zipper'],
+};
+
+async function syncProductImages() {
+  let updated = 0;
+  for (const [slug, imageKeys] of Object.entries(CATEGORY_IMAGE_KEYS)) {
+    const products = await prisma.product.findMany({
+      where: { slug: { startsWith: `${slug}-` } },
+      orderBy: { slug: 'asc' },
+    });
+    for (let i = 0; i < products.length; i++) {
+      const images = pickProductImages(imageKeys, i);
+      if (products[i].images !== images) {
+        await prisma.product.update({
+          where: { id: products[i].id },
+          data: { images },
+        });
+        updated += 1;
+      }
+    }
+  }
+  console.log(`Synced product images (${updated} updated)`);
 }
 
 async function syncProductNames() {
@@ -127,6 +165,7 @@ async function main() {
     console.log(`Database already has ${existingProducts} products — syncing catalog.`);
     await syncHeroSlides();
     await syncProductNames();
+    await syncProductImages();
     await ensureAdminUser();
     return;
   }
@@ -153,28 +192,7 @@ async function main() {
   }
 
   // Create products for each category
-  const categoryProducts = {
-    'baggy-jeans': ['baggyJeans'],
-    'cargo-jeans': ['cargoJeans'],
-    'straight-fit': ['straightFit'],
-    'tracksuit': ['tracksuit'],
-    'trouser': ['trouser'],
-    'basic-t-shirt': ['basicTshirt'],
-    'polo': ['polo'],
-    'over-sized': ['oversized'],
-    'graphic-tee': ['graphicTee'],
-    'formal-shirt': ['formalShirt'],
-    'long-shirt': ['longShirt'],
-    'night-suit': ['nightSuit'],
-    'kids-jeans': ['kidsJeans'],
-    'kids-t-shirts': ['kidsTshirts'],
-    'denim-jacket': ['denimJacket'],
-    'hoodie': ['hoodie'],
-    'puffer-jacket': ['puffer'],
-    'zipper': ['zipper'],
-  };
-
-  for (const [slug, imageKeys] of Object.entries(categoryProducts)) {
+  for (const [slug, imageKeys] of Object.entries(CATEGORY_IMAGE_KEYS)) {
     const category = createdCategories[slug];
     if (!category) continue;
     
