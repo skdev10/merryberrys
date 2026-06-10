@@ -3,11 +3,17 @@ import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/password';
 import { createSessionToken } from '@/lib/authServer';
 import { isDatabaseConnectionError, databaseErrorResponse } from '@/lib/dbErrors';
+import { analyzeDatabaseUrl } from '@/lib/validateDatabaseUrl';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(request) {
+  const urlCheck = analyzeDatabaseUrl();
+  if (!urlCheck.ok) {
+    return NextResponse.json(databaseErrorResponse(urlCheck.message), { status: 503 });
+  }
+
   try {
     const body = await request.json();
     const email = String(body?.email || '').trim().toLowerCase();

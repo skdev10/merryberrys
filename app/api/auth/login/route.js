@@ -3,8 +3,14 @@ import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/password';
 import { createSessionToken } from '@/lib/authServer';
 import { isDatabaseConnectionError, databaseErrorResponse } from '@/lib/dbErrors';
+import { analyzeDatabaseUrl } from '@/lib/validateDatabaseUrl';
 
 export async function POST(request) {
+  const urlCheck = analyzeDatabaseUrl();
+  if (!urlCheck.ok) {
+    return NextResponse.json(databaseErrorResponse(urlCheck.message), { status: 503 });
+  }
+
   try {
     const { email, password } = await request.json();
     if (!email || !password) {
