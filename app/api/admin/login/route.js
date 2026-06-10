@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/password';
 import { createSessionToken } from '@/lib/authServer';
+import { isDatabaseConnectionError, databaseErrorResponse } from '@/lib/dbErrors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -41,6 +42,9 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error('Admin login error:', error);
+    if (isDatabaseConnectionError(error)) {
+      return NextResponse.json(databaseErrorResponse(), { status: 503 });
+    }
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }

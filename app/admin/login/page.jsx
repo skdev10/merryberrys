@@ -31,7 +31,11 @@ export default function AdminLogin() {
         localStorage.setItem('adminUser', JSON.stringify(data.user));
         router.push('/admin');
       } else {
-        setError(data.message || 'Invalid credentials');
+        setError(
+          data.code === 'DATABASE_UNAVAILABLE'
+            ? `${data.message} Check /api/setup/status on your site.`
+            : data.message || 'Invalid credentials'
+        );
       }
     } catch (err) {
       setError('Something went wrong. Please try again.');

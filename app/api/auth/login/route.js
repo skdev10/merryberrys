@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/password';
 import { createSessionToken } from '@/lib/authServer';
+import { isDatabaseConnectionError, databaseErrorResponse } from '@/lib/dbErrors';
 
 export async function POST(request) {
   try {
@@ -32,6 +33,9 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error('auth login', error);
+    if (isDatabaseConnectionError(error)) {
+      return NextResponse.json(databaseErrorResponse(), { status: 503 });
+    }
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
