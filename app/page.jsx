@@ -12,35 +12,10 @@ import { FREE_SHIPPING_THRESHOLD } from '@/lib/cart';
 import { formatPrice } from '@/lib/currency';
 import { addCartItem } from '@/lib/cart';
 import { notifyAddedToCart } from '@/lib/cartNotify';
-
-const collectionImages = [
-  {
-    src: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=1200&q=85&auto=format&fit=crop',
-    title: "Men's Lower",
-    subtitle: 'Baggy, Cargo & Straight Fit',
-    href: '/shop?category=baggy-jeans'
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=1200&q=85&auto=format&fit=crop',
-    title: "Men's Upper",
-    subtitle: 'Polos, Graphic Tees & More',
-    href: '/shop?category=basic-t-shirt'
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1200&q=85&auto=format&fit=crop',
-    title: 'Winter Edit',
-    subtitle: 'Puffers, Hoodies & Jackets',
-    href: '/shop?category=hoodie'
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=85&auto=format&fit=crop',
-    title: 'Women & Kids',
-    subtitle: 'Long Shirts & Kids Wear',
-    href: '/shop?category=long-shirt'
-  },
-];
+import { useSiteSettings } from '@/components/SiteSettingsProvider';
 
 export default function LuxuryHome() {
+  const site = useSiteSettings();
   const [featured, setFeatured] = useState([]);
 
   const handleAddToCart = (product) => {
@@ -83,7 +58,7 @@ export default function LuxuryHome() {
             </Reveal>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {collectionImages.map((collection, index) => (
+              {site.homepageCollections.map((collection, index) => (
                 <Reveal
                   key={index}
                   as={Link}
@@ -178,7 +153,7 @@ export default function LuxuryHome() {
         <section className="relative h-[80vh] min-h-[600px] flex items-center">
           <div className="absolute inset-0">
             <RemoteImg
-              src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=80&auto=format&fit=crop"
+              src={site.homepageEditorialImage}
               alt="Editorial"
               className="absolute inset-0 h-full w-full object-cover"
               priority

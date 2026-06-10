@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { SITE } from '@/lib/site';
 import SocialLinks from '@/components/SocialLinks';
+import { FooterLogo } from '@/components/BrandLogo';
 
 export default function Footer() {
   return (
@@ -11,12 +12,7 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
             <div>
               <Link href="/" className="flex items-center gap-2 mb-6 group">
-                <div className="w-10 h-10 bg-gradient-to-br from-berry-500 to-gold-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">M</span>
-                </div>
-                <span className="font-serif text-2xl font-bold tracking-tight text-white group-hover:text-berry-400 transition-colors">
-                  MERRY <span className="text-berry-500">BERRY</span>
-                </span>
+                <FooterLogo />
               </Link>
               <p className="text-zinc-400 text-sm leading-relaxed mb-6">
                 {SITE.welcomeTitle} Premium Pakistani fashion — {SITE.tagline}.

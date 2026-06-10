@@ -5,43 +5,10 @@ import Footer from '../../components/Footer';
 import RemoteImg from '@/components/RemoteImg';
 import Reveal from '@/components/Reveal';
 import { ArrowRight } from 'lucide-react';
-
-const collections = [
-  {
-    id: 1,
-    name: 'Summer 2026',
-    description: 'Light, airy pieces for the warm season',
-    image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=1200&q=85&auto=format&fit=crop',
-    itemCount: 24,
-    href: '/shop?sort=new',
-  },
-  {
-    id: 2,
-    name: 'Evening Edit',
-    description: 'Elegant pieces for special occasions',
-    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80',
-    itemCount: 18,
-    href: '/shop?category=formal-shirt',
-  },
-  {
-    id: 3,
-    name: 'Essentials',
-    description: 'Timeless staples for every wardrobe',
-    image: 'https://images.unsplash.com/photo-1496745911865-6eaf0dc4b?w=800&q=80',
-    itemCount: 32,
-    href: '/shop?category=basic-t-shirt',
-  },
-  {
-    id: 4,
-    name: 'Winter Collection',
-    description: 'Cozy luxury for cold days',
-    image: 'https://images.unsplash.com/photo-1539533018447-63fcce268581?w=800&q=80',
-    itemCount: 28,
-    href: '/shop?category=hoodie',
-  },
-];
+import { useSiteSettings } from '@/components/SiteSettingsProvider';
 
 export default function CollectionsPage() {
+  const { collectionsPage: collections } = useSiteSettings();
   return (
     <>
       <LuxuryNavbar />

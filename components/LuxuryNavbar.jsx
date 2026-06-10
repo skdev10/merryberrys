@@ -24,6 +24,7 @@ import {
 
 } from '@/lib/auth';
 import { CART_STORAGE_KEY } from '@/lib/cart';
+import { NavbarLogo } from '@/components/BrandLogo';
 
 
 
@@ -261,15 +262,7 @@ export default function LuxuryNavbar() {
 
             <Link href="/" className="absolute left-1/2 -translate-x-1/2">
 
-              <h1 className={`font-serif text-2xl md:text-3xl tracking-[0.15em] font-medium transition-colors ${
-
-                scrolled ? 'text-luxury-black' : 'text-luxury-black'
-
-              }`}>
-
-                MERRY BERRY
-
-              </h1>
+              <NavbarLogo scrolled={scrolled} />
 
             </Link>
 
@@ -547,7 +540,7 @@ export default function LuxuryNavbar() {
 
           <div className="flex items-center justify-between mb-12">
 
-            <h1 className="font-serif text-2xl tracking-[0.15em]">MERRY BERRY</h1>
+            <NavbarLogo scrolled={false} />
 
             <button 
 

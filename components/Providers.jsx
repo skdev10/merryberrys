@@ -1,10 +1,11 @@
 'use client';
 
 import { Toaster } from 'react-hot-toast';
+import { SiteSettingsProvider } from '@/components/SiteSettingsProvider';
 
 export default function Providers({ children }) {
   return (
-    <>
+    <SiteSettingsProvider>
       {children}
       <Toaster
         position="top-center"
@@ -18,6 +19,6 @@ export default function Providers({ children }) {
           },
         }}
       />
-    </>
+    </SiteSettingsProvider>
   );
 }

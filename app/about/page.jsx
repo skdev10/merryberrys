@@ -9,8 +9,7 @@ import Reveal from '@/components/Reveal';
 import { ArrowRight, Heart, Scissors, Leaf, Award, Sparkles, Star, Quote, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from 'lucide-react';
 import { SITE } from '@/lib/site';
 import SocialLinks from '@/components/SocialLinks';
-
-const ABOUT_IMAGE = '/images/about-premium-tshirt.png';
+import { useSiteSettings } from '@/components/SiteSettingsProvider';
 
 /* ─── Animated counter for stats ─── */
 function AnimatedCounter({ target, suffix = '', duration = 2000 }) {
@@ -99,6 +98,7 @@ const testimonials = [
 ];
 
 export default function AboutPage() {
+  const { aboutImages } = useSiteSettings();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   /* Auto-advance testimonials */
@@ -120,7 +120,7 @@ export default function AboutPage() {
         <section className="about-hero-banner relative flex min-h-[520px] h-[72vh] sm:h-[78vh] md:h-[85vh] md:min-h-[600px] items-end overflow-hidden">
           <div className="absolute inset-0">
             <RemoteImg
-              src={ABOUT_IMAGE}
+              src={aboutImages.hero}
               alt="Merry Berry premium men's solid color t-shirt"
               className="absolute inset-0 h-full w-full object-cover object-center md:object-[center_30%] hero-ken"
               priority
@@ -176,7 +176,7 @@ export default function AboutPage() {
               <Reveal className="relative" style={{ transitionDelay: '0.2s' }}>
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <RemoteImg
-                    src="https://images.unsplash.com/photo-1618354691373-d851c43c8a0a?w=800&q=90&auto=format&fit=crop"
+                    src={aboutImages.craftsmanship}
                     alt="Merry Berry craftsmanship and quality fabrics"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
@@ -303,7 +303,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
               <Reveal className="relative aspect-[4/3] overflow-hidden order-2 lg:order-1">
                 <RemoteImg
-                  src="https://images.unsplash.com/photo-1586105256595-7d9c9c4e8c0c?w=800&q=90&auto=format&fit=crop"
+                  src={aboutImages.quality}
                   alt="Merry Berry t-shirt production"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
@@ -443,7 +443,7 @@ export default function AboutPage() {
               <Reveal className="order-1 lg:order-2 relative" style={{ transitionDelay: '0.2s' }}>
                 <div className="relative aspect-[3/4] overflow-hidden">
                   <RemoteImg
-                    src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=90&auto=format&fit=crop"
+                    src={aboutImages.team}
                     alt="Merry Berry winter collection"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
@@ -534,7 +534,7 @@ export default function AboutPage() {
         <section className="relative flex min-h-[420px] h-[60vh] sm:h-[65vh] md:h-[70vh] md:min-h-[500px] items-center">
           <div className="absolute inset-0">
             <RemoteImg
-              src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1600&q=90&auto=format&fit=crop"
+              src={aboutImages.promise}
               alt="Merry Berry streetwear"
               className="absolute inset-0 h-full w-full object-cover"
             />

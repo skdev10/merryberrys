@@ -26,6 +26,7 @@ const AdminSidebar = () => {
         { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
         { name: 'Customers', href: '/admin/customers', icon: Users },
         { name: 'Banners', href: '/admin/banners', icon: ImageIcon },
+        { name: 'Site Images', href: '/admin/site-images', icon: ImageIcon },
         { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
         { name: 'Stores', href: '/admin/stores', icon: Store },
         { name: 'Approve Store', href: '/admin/approve', icon: ShieldCheck },

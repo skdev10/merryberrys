@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const { pickProductImages } = require('../lib/productImages.cjs');
 const { HERO_SLIDES, PRODUCT_NAMES } = require('../lib/catalogData.cjs');
+const { DEFAULT_SITE_MEDIA, SITE_MEDIA_KEY } = require('../lib/siteSettingsDefaults.cjs');
 
 const prisma = new PrismaClient();
 
@@ -129,6 +130,21 @@ async function syncProductNames() {
   console.log(`Synced product names (${updated} updated)`);
 }
 
+async function syncSiteMedia() {
+  const existing = await prisma.siteSetting.findUnique({
+    where: { key: SITE_MEDIA_KEY },
+  });
+  if (!existing) {
+    await prisma.siteSetting.create({
+      data: {
+        key: SITE_MEDIA_KEY,
+        value: JSON.stringify(DEFAULT_SITE_MEDIA),
+      },
+    });
+    console.log('Created default site media settings');
+  }
+}
+
 async function ensureAdminUser() {
   const adminEmail = 'admin@merryberry.com';
   const adminPassword = 'admin123';
@@ -166,6 +182,7 @@ async function main() {
     await syncHeroSlides();
     await syncProductNames();
     await syncProductImages();
+    await syncSiteMedia();
     await ensureAdminUser();
     return;
   }
@@ -213,6 +230,7 @@ async function main() {
   await prisma.heroSlide.createMany({ data: HERO_SLIDES });
   console.log('Created hero slides');
 
+  await syncSiteMedia();
   await ensureAdminUser();
 
   console.log('Seeding finished.');
