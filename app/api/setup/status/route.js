@@ -14,11 +14,12 @@ export async function GET() {
         database: 'misconfigured',
         reason: urlCheck.reason,
         message: urlCheck.message,
+        deployment: process.env.VERCEL_URL || null,
         fix: [
           '1. Open https://console.neon.tech → your project (restore if paused)',
           '2. Connection details → Pooled connection → copy full URL',
-          '3. Vercel → merryberrys → Settings → Environment Variables → DATABASE_URL',
-          '4. Redeploy → check this URL again',
+          '3. Vercel → THIS project → Settings → Environment Variables → DATABASE_URL',
+          '4. Redeploy → check /api/setup/status again',
         ],
       },
       { status: 503 }
@@ -34,6 +35,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       database: 'connected',
+      deployment: process.env.VERCEL_URL || null,
       products,
       categories,
       users,

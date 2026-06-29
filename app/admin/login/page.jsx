@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Lock, Mail, ArrowRight, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ArrowRight, Sparkles, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminLogin() {
@@ -10,7 +10,15 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [dbStatus, setDbStatus] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    fetch('/api/setup/status', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => setDbStatus(data))
+      .catch(() => setDbStatus({ ok: false, message: 'Could not reach setup status API.' }));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,6 +83,28 @@ export default function AdminLogin() {
 
         {/* Login Form */}
         <div className="glass-card rounded-2xl p-8 border border-white/10">
+          {dbStatus && !dbStatus.ok && (
+            <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-200 text-sm space-y-2">
+              <p className="flex items-center gap-2 font-medium text-amber-100">
+                <AlertTriangle size={16} /> Database not ready — admin login will fail until this is fixed
+              </p>
+              <p>{dbStatus.message}</p>
+              {Array.isArray(dbStatus.fix) && (
+                <ol className="list-decimal list-inside text-xs text-amber-200/90 space-y-1 pt-1">
+                  {dbStatus.fix.map((step) => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
+              )}
+              <p className="text-xs text-amber-200/70 pt-1">
+                Live check:{' '}
+                <a href="/api/setup/status" className="underline" target="_blank" rel="noreferrer">
+                  /api/setup/status
+                </a>
+              </p>
+            </div>
+          )}
+
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
               {error}
