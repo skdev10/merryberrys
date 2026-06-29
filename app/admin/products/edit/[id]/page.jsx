@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { adminFetch } from '@/lib/adminClient';
 import { ArrowLeft } from 'lucide-react';
+import ProductImagesField from '@/components/admin/ProductImagesField';
 
 export default function EditProductPage() {
   const { id } = useParams();
@@ -20,7 +21,7 @@ export default function EditProductPage() {
     categoryId: '',
     inStock: true,
     stockQuantity: '',
-    imageLines: '',
+    images: [],
     sizes: '',
     colors: '',
   });
@@ -49,7 +50,7 @@ export default function EditProductPage() {
           categoryId: p.categoryId || '',
           inStock: !!p.inStock,
           stockQuantity: String(p.stockQuantity ?? 0),
-          imageLines: imgs.join('\n'),
+          images: imgs,
           sizes: (p.sizes || []).join(', '),
           colors: (p.colors || []).join(', '),
         });
@@ -63,10 +64,7 @@ export default function EditProductPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      const images = form.imageLines
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const images = form.images.map((s) => String(s).trim()).filter(Boolean);
       const sizes = form.sizes.split(',').map((s) => s.trim()).filter(Boolean);
       const colors = form.colors.split(',').map((s) => s.trim()).filter(Boolean);
       await adminFetch(`/api/admin/products/${id}`, {
@@ -151,12 +149,9 @@ export default function EditProductPage() {
           value={form.stockQuantity}
           onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })}
         />
-        <label className="block text-xs text-zinc-500 uppercase tracking-wider">Image URLs (one per line)</label>
-        <textarea
-          rows={6}
-          className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm resize-none"
-          value={form.imageLines}
-          onChange={(e) => setForm({ ...form, imageLines: e.target.value })}
+        <ProductImagesField
+          images={form.images}
+          onChange={(images) => setForm({ ...form, images })}
         />
         <input
           className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white"

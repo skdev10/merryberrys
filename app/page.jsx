@@ -153,7 +153,7 @@ export default function LuxuryHome() {
         <section className="relative h-[80vh] min-h-[600px] flex items-center">
           <div className="absolute inset-0">
             <RemoteImg
-              src={site.homepageEditorialImage}
+              src={site.homepageEditorial?.image || site.homepageEditorialImage}
               alt="Editorial"
               className="absolute inset-0 h-full w-full object-cover"
               priority
@@ -163,17 +163,21 @@ export default function LuxuryHome() {
           <div className="container-luxury relative z-10">
             <Reveal className="max-w-2xl mx-auto text-center">
               <p className="text-luxury-caption text-luxury-white/70 mb-6">
-                The Art of Dressing
+                {site.homepageEditorial?.caption || 'The Art of Dressing'}
               </p>
               <h2 className="font-serif text-5xl md:text-7xl text-luxury-white mb-8 leading-tight">
-                Dress with<br />
-                <span className="italic font-light">Confidence</span>
+                {site.homepageEditorial?.titleLine1 || 'Dress with'}<br />
+                <span className="italic font-light">{site.homepageEditorial?.titleLine2 || 'Confidence'}</span>
               </h2>
               <p className="text-luxury-white/80 text-lg mb-10 max-w-lg mx-auto">
-                Each piece is thoughtfully designed in Pakistan to transcend seasons, offering enduring style for the modern wardrobe.
+                {site.homepageEditorial?.body ||
+                  'Each piece is thoughtfully designed in Pakistan to transcend seasons, offering enduring style for the modern wardrobe.'}
               </p>
-              <Link href="/about" className="btn-luxury-outline border-luxury-white text-luxury-white hover:text-luxury-black">
-                <span>Our Story</span>
+              <Link
+                href={site.homepageEditorial?.buttonHref || '/about'}
+                className="btn-luxury-outline border-luxury-white text-luxury-white hover:text-luxury-black"
+              >
+                <span>{site.homepageEditorial?.buttonLabel || 'Our Story'}</span>
               </Link>
             </Reveal>
           </div>

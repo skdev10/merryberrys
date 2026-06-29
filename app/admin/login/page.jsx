@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock, Mail, ArrowRight, Sparkles, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import { useSiteSettings } from '@/components/SiteSettingsProvider';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [dbStatus, setDbStatus] = useState(null);
   const router = useRouter();
+  const site = useSiteSettings();
 
   useEffect(() => {
     fetch('/api/setup/status', { cache: 'no-store' })
@@ -58,7 +60,12 @@ export default function AdminLogin() {
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-berry-500/20 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1441986300917-64674bad6001?w=1600&q=80')] bg-cover bg-center opacity-5"></div>
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-5"
+          style={{
+            backgroundImage: `url('${site.adminLoginBackground || 'https://images.unsplash.com/photo-1441986300917-64674bad6001?w=1600&q=80'}')`,
+          }}
+        />
       </div>
 
       <div className="relative z-10 w-full max-w-md px-6">

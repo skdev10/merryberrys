@@ -5,12 +5,14 @@ import Link from 'next/link';
 import RemoteImg from '@/components/RemoteImg';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DEFAULT_HERO_SLIDES } from '@/lib/heroSlides';
+import { useSiteSettings } from '@/components/SiteSettingsProvider';
 
 const AUTO_MS = 7000;
 
 export default function HeroCarousel({ slides: initialSlides }) {
-  const fallback = initialSlides?.length ? initialSlides : DEFAULT_HERO_SLIDES;
-  const [slides, setSlides] = useState(fallback);
+  const site = useSiteSettings();
+  const fallbackSlides = initialSlides?.length ? initialSlides : DEFAULT_HERO_SLIDES;
+  const [slides, setSlides] = useState(fallbackSlides);
   const [index, setIndex] = useState(0);
   const [ready, setReady] = useState(true);
 
@@ -51,24 +53,23 @@ export default function HeroCarousel({ slides: initialSlides }) {
   }
 
   if (!len || !current) {
+    const fb = site.heroFallback || {};
     return (
       <section className="hero-shell relative overflow-hidden bg-luxury-black">
         <RemoteImg
-          src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1920&q=85"
-          alt="Streetwear"
+          src={fb.image || 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1920&q=85'}
+          alt={fb.title || 'Merry Berry'}
           className="hero-bg-img absolute inset-0 h-full w-full object-cover"
           priority
         />
         <div className="hero-vignette pointer-events-none absolute inset-0" />
         <div className="relative z-10 flex min-h-[560px] items-center px-6 py-28 md:px-12">
           <div className="container-luxury max-w-xl">
-            <p className="text-luxury-caption mb-4 text-luxury-gold/90">Merry Berry</p>
-            <h1 className="font-serif text-4xl leading-[1.1] text-luxury-white md:text-6xl">Baggy fits & streetwear</h1>
-            <p className="mt-6 text-sm text-luxury-white/75 md:text-base">
-              Add slides in Admin → Banners. High‑res JPG/PNG URLs work best.
-            </p>
-            <Link href="/shop" className="btn-luxury mt-10 inline-flex">
-              <span>Shop now</span>
+            <p className="text-luxury-caption mb-4 text-luxury-gold/90">{fb.badge || 'Merry Berry'}</p>
+            <h1 className="font-serif text-4xl leading-[1.1] text-luxury-white md:text-6xl">{fb.title || 'Shop the collection'}</h1>
+            <p className="mt-6 text-sm text-luxury-white/75 md:text-base">{fb.subtitle || ''}</p>
+            <Link href={fb.ctaHref || '/shop'} className="btn-luxury mt-10 inline-flex">
+              <span>{fb.ctaLabel || 'Shop now'}</span>
             </Link>
           </div>
         </div>

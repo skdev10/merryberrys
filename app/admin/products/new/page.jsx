@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { adminFetch } from '@/lib/adminClient';
 import { ArrowLeft } from 'lucide-react';
+import ProductImagesField from '@/components/admin/ProductImagesField';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function NewProductPage() {
     categoryId: '',
     inStock: true,
     stockQuantity: '100',
-    imageLines: '',
+    images: [],
     sizes: 'S, M, L, XL, XXL',
     colors: 'Black, Navy, Grey, White, Olive',
   });
@@ -36,10 +37,7 @@ export default function NewProductPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const images = form.imageLines
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const images = form.images.map((s) => String(s).trim()).filter(Boolean);
       const sizes = form.sizes.split(',').map((s) => s.trim()).filter(Boolean);
       const colors = form.colors.split(',').map((s) => s.trim()).filter(Boolean);
       const slug =
@@ -123,13 +121,9 @@ export default function NewProductPage() {
           value={form.stockQuantity}
           onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })}
         />
-        <label className="block text-xs text-zinc-500 uppercase tracking-wider">Image URLs (one per line)</label>
-        <textarea
-          rows={5}
-          className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm resize-none"
-          placeholder="https://…"
-          value={form.imageLines}
-          onChange={(e) => setForm({ ...form, imageLines: e.target.value })}
+        <ProductImagesField
+          images={form.images}
+          onChange={(images) => setForm({ ...form, images })}
         />
         <input
           className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white"

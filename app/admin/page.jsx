@@ -196,13 +196,9 @@ export default function AdminDashboard() {
                                 <ShoppingCart size={20} />
                                 <span>View Orders</span>
                             </Link>
-                            <Link href="/admin/banners" className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/50 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/5 transition-all">
+                            <Link href="/admin/media" className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/50 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/5 transition-all">
                                 <Calendar size={20} />
-                                <span>Update Banners</span>
-                            </Link>
-                            <Link href="/admin/site-images" className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/50 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/5 transition-all">
-                                <Calendar size={20} />
-                                <span>Site Images & Logo</span>
+                                <span>Media Center (images)</span>
                             </Link>
                         </div>
                     </div>
