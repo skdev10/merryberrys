@@ -4,6 +4,7 @@ import { useRouter, usePathname } from "next/navigation"
 import Loading from "../Loading"
 import AdminNavbar from "./AdminNavbar"
 import AdminSidebar from "./AdminSidebar"
+import { adminFetch, clearAdminSession } from "@/lib/adminClient"
 
 const AdminLayout = ({ children }) => {
     const [isAdmin, setIsAdmin] = useState(false)
@@ -19,25 +20,30 @@ const AdminLayout = ({ children }) => {
             return
         }
 
-        const checkAuth = () => {
+        const checkAuth = async () => {
             const token = localStorage.getItem('adminToken')
-            const user = localStorage.getItem('adminUser')
-            
-            if (!token || !user) {
+
+            if (!token) {
                 router.push('/admin/login')
                 return
             }
 
             try {
-                const parsedUser = JSON.parse(user)
-                if (parsedUser.role !== 'admin') {
-                    router.push('/admin/login')
+                const res = await adminFetch('/api/admin/session', { cache: 'no-store' })
+
+                if (!res.ok) {
+                    clearAdminSession()
+                    router.push('/admin/login?expired=1')
                     return
                 }
-                setAdminUser(parsedUser)
+
+                const data = await res.json()
+                setAdminUser(data.user)
+                localStorage.setItem('adminUser', JSON.stringify(data.user))
                 setIsAdmin(true)
-            } catch (error) {
-                router.push('/admin/login')
+            } catch {
+                clearAdminSession()
+                router.push('/admin/login?expired=1')
             } finally {
                 setLoading(false)
             }

@@ -2,13 +2,13 @@
 import { useRouter } from "next/navigation"
 import { Bell, LogOut, Search, User, Menu, X } from "lucide-react"
 import Link from "next/link"
+import { clearAdminSession } from "@/lib/adminClient"
 
 const AdminNavbar = ({ adminUser, sidebarOpen, onMenuToggle }) => {
     const router = useRouter()
 
     const handleLogout = () => {
-        localStorage.removeItem('adminToken')
-        localStorage.removeItem('adminUser')
+        clearAdminSession()
         router.push('/admin/login')
     }
 

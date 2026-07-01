@@ -29,7 +29,11 @@ export default function ImageUrlField({
       const res = await adminFetch('/api/admin/upload', { method: 'POST', body: formData });
       const data = await res.json();
       if (!res.ok) {
-        setUploadError(data.message || 'Upload failed');
+        setUploadError(
+          res.status === 401
+            ? 'Session expire — logout karke dubara login karein'
+            : data.message || 'Upload failed'
+        );
         return;
       }
       onChange(data.url);

@@ -12,8 +12,13 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [dbStatus, setDbStatus] = useState(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
   const router = useRouter();
   const site = useSiteSettings();
+
+  useEffect(() => {
+    setSessionExpired(new URLSearchParams(window.location.search).get('expired') === '1');
+  }, []);
 
   useEffect(() => {
     fetch('/api/setup/status', { cache: 'no-store' })
@@ -109,6 +114,12 @@ export default function AdminLogin() {
                   /api/setup/status
                 </a>
               </p>
+            </div>
+          )}
+
+          {sessionExpired && (
+            <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-200 text-sm">
+              Session expire ho gayi hai. Dubara login karein, phir image upload kaam karega.
             </div>
           )}
 
