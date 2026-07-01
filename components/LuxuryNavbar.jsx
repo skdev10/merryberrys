@@ -224,7 +224,7 @@ export default function LuxuryNavbar() {
 
         <nav className="container-luxury">
 
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-20 md:h-24">
 
             {/* Left - Mobile Menu & Search */}
 
@@ -540,7 +540,7 @@ export default function LuxuryNavbar() {
 
           <div className="flex items-center justify-between mb-12">
 
-            <NavbarLogo scrolled={false} />
+            <NavbarLogo scrolled={false} variant="menu" />
 
             <button 
 

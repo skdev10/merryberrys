@@ -2,15 +2,20 @@
 
 import { useSiteSettings } from '@/components/SiteSettingsProvider';
 
-export function NavbarLogo({ scrolled }) {
+export function NavbarLogo({ scrolled, variant = 'default' }) {
   const { logoUrl, logoText } = useSiteSettings();
+
+  const imageClassName =
+    variant === 'menu'
+      ? 'h-14 sm:h-16 md:h-[4.5rem] w-auto max-w-[280px] sm:max-w-[340px] object-contain'
+      : 'h-12 sm:h-14 md:h-16 lg:h-[4.5rem] w-auto max-w-[240px] sm:max-w-[300px] md:max-w-[340px] lg:max-w-[380px] object-contain';
 
   if (logoUrl) {
     return (
       <img
         src={logoUrl}
         alt={logoText || 'Logo'}
-        className="h-8 md:h-10 w-auto max-w-[180px] object-contain"
+        className={imageClassName}
       />
     );
   }
@@ -35,7 +40,7 @@ export function FooterLogo() {
       <img
         src={src}
         alt={logoText || 'Merry Berry'}
-        className="h-10 w-auto max-w-[160px] object-contain"
+        className="h-14 sm:h-16 md:h-[4.5rem] w-auto max-w-[240px] sm:max-w-[300px] md:max-w-[360px] object-contain"
       />
     );
   }
