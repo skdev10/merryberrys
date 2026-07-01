@@ -145,6 +145,33 @@ async function syncSiteMedia() {
   }
 }
 
+const DEFAULT_COUPONS = [
+  { code: 'NEW20', description: '20% Off for New Users', discount: 20, forNewUser: true, forMember: false, isPublic: false, expiresAt: new Date('2026-12-31T00:00:00.000Z') },
+  { code: 'NEW10', description: '10% Off for New Users', discount: 10, forNewUser: true, forMember: false, isPublic: false, expiresAt: new Date('2026-12-31T00:00:00.000Z') },
+  { code: 'OFF20', description: '20% Off for All Users', discount: 20, forNewUser: false, forMember: false, isPublic: true, expiresAt: new Date('2026-12-31T00:00:00.000Z') },
+  { code: 'OFF10', description: '10% Off for All Users', discount: 10, forNewUser: false, forMember: false, isPublic: true, expiresAt: new Date('2026-12-31T00:00:00.000Z') },
+  { code: 'PLUS10', description: '10% Off for Members', discount: 10, forNewUser: false, forMember: true, isPublic: false, expiresAt: new Date('2027-03-06T00:00:00.000Z') },
+];
+
+async function syncCoupons() {
+  for (const coupon of DEFAULT_COUPONS) {
+    await prisma.coupon.upsert({
+      where: { code: coupon.code },
+      update: {
+        description: coupon.description,
+        discount: coupon.discount,
+        forNewUser: coupon.forNewUser,
+        forMember: coupon.forMember,
+        isPublic: coupon.isPublic,
+        expiresAt: coupon.expiresAt,
+        active: true,
+      },
+      create: coupon,
+    });
+  }
+  console.log(`Synced ${DEFAULT_COUPONS.length} coupons`);
+}
+
 async function ensureAdminUser() {
   const adminEmail = 'admin@merryberry.com';
   const adminPassword = 'admin123';
@@ -183,6 +210,7 @@ async function main() {
     await syncProductNames();
     await syncProductImages();
     await syncSiteMedia();
+    await syncCoupons();
     await ensureAdminUser();
     return;
   }
@@ -231,6 +259,7 @@ async function main() {
   console.log('Created hero slides');
 
   await syncSiteMedia();
+  await syncCoupons();
   await ensureAdminUser();
 
   console.log('Seeding finished.');
