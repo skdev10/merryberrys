@@ -150,7 +150,7 @@ export default function LuxuryHome() {
         </section>
 
         {/* Editorial Banner */}
-        <section className="relative h-[80vh] min-h-[600px] flex items-center">
+        <section className="relative h-[60vh] min-h-[400px] sm:h-[80vh] sm:min-h-[600px] flex items-center">
           <div className="absolute inset-0">
             <RemoteImg
               src={site.homepageEditorial?.image || site.homepageEditorialImage}

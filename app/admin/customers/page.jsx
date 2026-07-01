@@ -74,6 +74,7 @@ export default function AdminCustomersPage() {
             No users found.
           </div>
         ) : (
+          <div className="admin-table-scroll">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-white/5 bg-zinc-900/40 text-zinc-500">
               <tr>
@@ -102,6 +103,7 @@ export default function AdminCustomersPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

@@ -136,7 +136,7 @@ export default function AdminMediaPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-4xl w-full">
       <div>
         <h1 className="text-3xl font-serif text-white mb-1">Media Center</h1>
         <p className="text-zinc-500 text-sm max-w-2xl">

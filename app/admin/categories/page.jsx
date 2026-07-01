@@ -142,6 +142,7 @@ export default function AdminCategoriesPage() {
         {loading ? (
           <div className="p-8 text-center text-zinc-500">Loading categories...</div>
         ) : (
+          <div className="admin-table-scroll">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-white/5 bg-zinc-900/40 text-zinc-500">
               <tr>
@@ -173,6 +174,7 @@ export default function AdminCategoriesPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

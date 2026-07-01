@@ -9,17 +9,16 @@ const AdminLayout = ({ children }) => {
     const [isAdmin, setIsAdmin] = useState(false)
     const [loading, setLoading] = useState(true)
     const [adminUser, setAdminUser] = useState(null)
+    const [sidebarOpen, setSidebarOpen] = useState(false)
     const router = useRouter()
     const pathname = usePathname()
 
     useEffect(() => {
-        // Check if user is on login page
         if (pathname === '/admin/login') {
             setLoading(false)
             return
         }
 
-        // Check authentication
         const checkAuth = () => {
             const token = localStorage.getItem('adminToken')
             const user = localStorage.getItem('adminUser')
@@ -47,7 +46,10 @@ const AdminLayout = ({ children }) => {
         checkAuth()
     }, [router, pathname])
 
-    // Don't render layout for login page
+    useEffect(() => {
+        setSidebarOpen(false)
+    }, [pathname])
+
     if (pathname === '/admin/login') {
         return children
     }
@@ -56,13 +58,15 @@ const AdminLayout = ({ children }) => {
         <Loading />
     ) : isAdmin ? (
         <div className="min-h-screen bg-zinc-950">
-            <AdminNavbar adminUser={adminUser} />
-            <div className="flex">
-                <AdminSidebar />
-                <main className="flex-1 ml-64 p-8">
-                    {children}
-                </main>
-            </div>
+            <AdminNavbar
+                adminUser={adminUser}
+                sidebarOpen={sidebarOpen}
+                onMenuToggle={() => setSidebarOpen((open) => !open)}
+            />
+            <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <main className="w-full min-w-0 pt-16 lg:ml-64 px-3 sm:px-5 lg:px-8 pb-8">
+                {children}
+            </main>
         </div>
     ) : null
 }

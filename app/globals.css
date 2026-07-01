@@ -148,6 +148,14 @@
     @apply max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 lg:px-20;
   }
 
+  .admin-table-scroll {
+    @apply overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0;
+  }
+
+  .admin-table-scroll table {
+    min-width: 640px;
+  }
+
   .about-hero-banner .hero-ken {
     animation: none;
   }
@@ -414,6 +422,10 @@
 }
 
 @media (max-width: 768px) {
+  .hero-shell {
+    min-height: min(72vh, 680px);
+  }
+
   .hero-vignette {
     background: linear-gradient(
       180deg,
