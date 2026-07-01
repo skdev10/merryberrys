@@ -1,24 +1,21 @@
 import { NextResponse } from 'next/server';
 import { guardAdmin } from '@/lib/requireAdminApi';
+import { prisma } from '@/lib/prisma';
+import { analyzeDatabaseUrl } from '@/lib/validateDatabaseUrl';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_BYTES = 5 * 1024 * 1024;
+const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']);
 
 export async function POST(request) {
   const auth = await guardAdmin(request);
   if (!auth.ok) return auth.response;
 
-  const apiKey = process.env.IMGBB_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      {
-        message:
-          'Server upload not configured. Use ImgBB.com → upload → copy “Direct link”, ya Vercel par IMGBB_API_KEY add karein (free at api.imgbb.com).',
-      },
-      { status: 400 }
-    );
+  const urlCheck = analyzeDatabaseUrl();
+  if (!urlCheck.ok) {
+    return NextResponse.json({ message: urlCheck.message }, { status: 503 });
   }
 
   try {
@@ -29,32 +26,30 @@ export async function POST(request) {
     }
 
     if (file.size > MAX_BYTES) {
-      return NextResponse.json({ message: 'Image must be under 8MB' }, { status: 400 });
+      return NextResponse.json({ message: 'Image must be under 5MB' }, { status: 400 });
+    }
+
+    const mimeType = file.type || 'image/jpeg';
+    if (!ALLOWED.has(mimeType)) {
+      return NextResponse.json({ message: 'Use JPG, PNG, WebP, or GIF' }, { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const base64 = buffer.toString('base64');
+    const data = buffer.toString('base64');
 
-    const uploadRes = await fetch(
-      `https://api.imgbb.com/1/upload?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ image: base64 }),
-      }
-    );
+    const asset = await prisma.mediaAsset.create({
+      data: {
+        mimeType,
+        filename: file.name || 'upload',
+        data,
+        size: file.size,
+      },
+    });
 
-    const data = await uploadRes.json();
-    const url = data?.data?.url || data?.data?.display_url;
-
-    if (!uploadRes.ok || !url) {
-      console.error('imgbb upload', data);
-      return NextResponse.json({ message: 'Image host rejected upload' }, { status: 500 });
-    }
-
-    return NextResponse.json({ url });
+    const url = `/api/media/${asset.id}`;
+    return NextResponse.json({ url, id: asset.id });
   } catch (error) {
     console.error('admin upload', error);
-    return NextResponse.json({ message: 'Upload failed' }, { status: 500 });
+    return NextResponse.json({ message: 'Upload failed — check database connection' }, { status: 500 });
   }
 }

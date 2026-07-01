@@ -160,3 +160,12 @@ model SiteSetting {
     value     String
     updatedAt DateTime @updatedAt
 }
+
+model MediaAsset {
+    id        String   @id @default(cuid())
+    mimeType  String
+    filename  String?
+    data      String   // base64
+    size      Int
+    createdAt DateTime @default(now())
+}

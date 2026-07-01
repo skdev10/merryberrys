@@ -35,15 +35,8 @@ export default function AdminSettingsPage() {
           <Upload size={16} className="text-berry-400" /> Image upload tip
         </p>
         <p>
-          Admin mein <strong className="text-zinc-200">Upload image</strong> button use karein, ya{' '}
-          <a href="https://imgbb.com" className="text-berry-400 underline" target="_blank" rel="noreferrer">
-            ImgBB.com
-          </a>{' '}
-          par photo upload karke Direct Link paste karein.
-        </p>
-        <p>
-          Vercel par <code className="text-berry-300">IMGBB_API_KEY</code> add karein to upload button seedha
-          server se kaam karega (free: api.imgbb.com).
+          Admin mein photo choose karein — automatically save hoti hai database mein. Koi URL paste ki
+          zaroorat nahi.
         </p>
       </div>
 

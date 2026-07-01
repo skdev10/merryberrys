@@ -140,9 +140,9 @@ export default function AdminMediaPage() {
       <div>
         <h1 className="text-3xl font-serif text-white mb-1">Media Center</h1>
         <p className="text-zinc-500 text-sm max-w-2xl">
-          Yahan se website ki <strong className="text-zinc-300">sari images</strong> change karein — logo,
-          hero, homepage, collections, about. <strong className="text-zinc-300">Upload</strong> button se
-          direct photo upload, ya ImgBB link paste karein. Product photos → Products menu.
+          Yahan se website ki <strong className="text-zinc-300">sari images</strong> change karein.
+          Photo select karein → <strong className="text-zinc-300">Save page settings</strong> — website par
+          permanently update ho jayegi. Product photos → Products menu.
         </p>
       </div>
 

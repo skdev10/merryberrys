@@ -24,7 +24,7 @@ export default function ProductImagesField({ images, onChange }) {
       <div>
         <p className="text-sm font-medium text-zinc-200">Product photos</p>
         <p className="text-xs text-zinc-500 mt-1">
-          Pehli image main photo — doosri hover par dikhti hai. Upload ya URL paste karein.
+          Photo upload karein — website par permanently save hogi. Pehli = main, doosri = hover.
         </p>
       </div>
       {list.map((url, index) => (
