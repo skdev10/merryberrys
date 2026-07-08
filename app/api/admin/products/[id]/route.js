@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { guardAdmin } from '@/lib/requireAdminApi';
+import { buildProductUpdateData, formatAdminProduct } from '@/lib/adminProduct';
 
 // GET single product
 export async function GET(request, context) {
@@ -21,15 +22,7 @@ export async function GET(request, context) {
             );
         }
 
-        // Parse JSON fields
-        const formattedProduct = {
-            ...product,
-            images: JSON.parse(product.images || '[]'),
-            sizes: JSON.parse(product.sizes || '[]'),
-            colors: JSON.parse(product.colors || '[]')
-        };
-
-        return NextResponse.json({ product: formattedProduct });
+        return NextResponse.json({ product: formatAdminProduct(product) });
     } catch (error) {
         console.error('Error fetching product:', error);
         return NextResponse.json(
@@ -39,41 +32,52 @@ export async function GET(request, context) {
     }
 }
 
-// PUT update product
+// PUT update product (full)
 export async function PUT(request, context) {
     const auth = await guardAdmin(request);
     if (!auth.ok) return auth.response;
     try {
         const { id } = await context.params;
         const data = await request.json();
-        
-        const product = await prisma.product.update({
-            where: { id },
-            data: {
+
+        const existing = await prisma.product.findUnique({ where: { id } });
+        if (!existing) {
+            return NextResponse.json({ message: 'Product not found' }, { status: 404 });
+        }
+
+        const updateData = buildProductUpdateData(
+            {
                 name: data.name,
                 slug: data.slug,
                 description: data.description,
-                price: parseFloat(data.price),
-                images: JSON.stringify(data.images || []),
-                sizes: JSON.stringify(data.sizes || ['S', 'M', 'L', 'XL']),
-                colors: JSON.stringify(data.colors || ['Black', 'White']),
+                price: data.price,
                 categoryId: data.categoryId,
+                stockQuantity: data.stockQuantity,
                 inStock: data.inStock,
-                stockQuantity: Math.max(0, parseInt(data.stockQuantity ?? 0, 10) || 0)
-            }
+                images: data.images,
+                sizes: data.sizes,
+                colors: data.colors,
+            },
+            existing
+        );
+
+        const product = await prisma.product.update({
+            where: { id },
+            data: updateData,
+            include: { category: true },
         });
 
-        return NextResponse.json({ product });
+        return NextResponse.json({ product: formatAdminProduct(product) });
     } catch (error) {
         console.error('Error updating product:', error);
         return NextResponse.json(
-            { message: 'Failed to update product' },
-            { status: 500 }
+            { message: error.message || 'Failed to update product' },
+            { status: error.message?.includes('required') ? 400 : 500 }
         );
     }
 }
 
-// PATCH — update product images only
+// PATCH — partial update (name, price, stock, images, etc.)
 export async function PATCH(request, context) {
     const auth = await guardAdmin(request);
     if (!auth.ok) return auth.response;
@@ -81,31 +85,28 @@ export async function PATCH(request, context) {
         const { id } = await context.params;
         const data = await request.json();
 
-        if (!Array.isArray(data.images)) {
-            return NextResponse.json({ message: 'images array required' }, { status: 400 });
+        const existing = await prisma.product.findUnique({ where: { id } });
+        if (!existing) {
+            return NextResponse.json({ message: 'Product not found' }, { status: 404 });
         }
 
-        const images = data.images.map((s) => String(s).trim()).filter(Boolean);
+        const updateData = buildProductUpdateData(data, existing);
+        if (Object.keys(updateData).length === 0) {
+            return NextResponse.json({ message: 'No fields to update' }, { status: 400 });
+        }
 
         const product = await prisma.product.update({
             where: { id },
-            data: { images: JSON.stringify(images) },
+            data: updateData,
             include: { category: true },
         });
 
-        const formattedProduct = {
-            ...product,
-            images: JSON.parse(product.images || '[]'),
-            sizes: JSON.parse(product.sizes || '[]'),
-            colors: JSON.parse(product.colors || '[]'),
-        };
-
-        return NextResponse.json({ product: formattedProduct });
+        return NextResponse.json({ product: formatAdminProduct(product) });
     } catch (error) {
-        console.error('Error updating product images:', error);
+        console.error('Error patching product:', error);
         return NextResponse.json(
-            { message: 'Failed to update product images' },
-            { status: 500 }
+            { message: error.message || 'Failed to update product' },
+            { status: error.message?.includes('required') ? 400 : 500 }
         );
     }
 }

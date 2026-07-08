@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { adminFetch } from '@/lib/adminClient';
 import { Plus, Save, Trash2, X } from 'lucide-react';
 
@@ -58,10 +59,13 @@ export default function AdminCategoriesPage() {
     const data = await res.json();
 
     if (!res.ok) {
-      setMessage(data.message || 'Failed to save category');
+      const msg = data.message || 'Failed to save category';
+      setMessage(msg);
+      toast.error(msg);
       return;
     }
 
+    toast.success(editingId ? 'Category update ho gayi' : 'Category create ho gayi');
     setMessage(editingId ? 'Category updated' : 'Category created');
     resetForm();
     fetchCategories();
@@ -81,9 +85,12 @@ export default function AdminCategoriesPage() {
     const res = await adminFetch(`/api/admin/categories/${category.id}`, { method: 'DELETE' });
     const data = await res.json();
     if (!res.ok) {
-      setMessage(data.message || 'Failed to delete category');
+      const msg = data.message || 'Failed to delete category';
+      setMessage(msg);
+      toast.error(msg);
       return;
     }
+    toast.success('Category delete ho gayi');
     setMessage('Category deleted');
     fetchCategories();
   };

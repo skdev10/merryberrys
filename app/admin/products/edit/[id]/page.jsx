@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { adminFetch } from '@/lib/adminClient';
+import { slugify } from '@/lib/adminProduct';
 import { ArrowLeft } from 'lucide-react';
 import ProductImagesField from '@/components/admin/ProductImagesField';
 
@@ -14,6 +16,7 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [autoSlug, setAutoSlug] = useState(false);
   const [form, setForm] = useState({
     name: '',
     slug: '',
@@ -85,8 +88,10 @@ export default function EditProductPage() {
           inStock: form.inStock,
         }),
       });
-      if (res.ok) router.push('/admin/products');
-      else {
+      if (res.ok) {
+        toast.success('Product update ho gaya');
+        router.push('/admin/products');
+      } else {
         const data = await res.json();
         setError(data.message || 'Save failed');
       }
@@ -113,14 +118,28 @@ export default function EditProductPage() {
           className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white"
           placeholder="Product name"
           value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              name: e.target.value,
+              slug: autoSlug ? slugify(e.target.value) : form.slug,
+            })
+          }
         />
+        <div className="flex items-center justify-between gap-2">
+          <label className="text-xs text-zinc-500 uppercase tracking-wider">URL slug</label>
+          <label className="flex items-center gap-2 text-xs text-zinc-400">
+            <input type="checkbox" checked={autoSlug} onChange={(e) => setAutoSlug(e.target.checked)} />
+            Name se auto update
+          </label>
+        </div>
         <input
           required
-          className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white"
+          disabled={autoSlug}
+          className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white disabled:opacity-60"
           placeholder="URL slug"
           value={form.slug}
-          onChange={(e) => setForm({ ...form, slug: e.target.value })}
+          onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })}
         />
         <textarea
           required

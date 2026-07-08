@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { adminFetch } from '@/lib/adminClient';
 import { parseProductImages } from '@/lib/productImages';
 import ProductImagesField from '@/components/admin/ProductImagesField';
@@ -17,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function ProductImagesPage() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,6 +51,11 @@ export default function ProductImagesPage() {
     loadProducts();
   }, [loadProducts]);
 
+  useEffect(() => {
+    const productId = searchParams.get('product');
+    if (productId) setExpandedId(productId);
+  }, [searchParams]);
+
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -76,6 +84,7 @@ export default function ProductImagesPage() {
         prev.map((p) => (p.id === id ? { ...p, images: data.product.images } : p))
       );
       setDrafts((prev) => ({ ...prev, [id]: data.product.images }));
+      toast.success('Photos save ho gayi');
       setMessages((prev) => ({ ...prev, [id]: '✓ Photos saved — website refresh karein' }));
     } catch {
       setMessages((prev) => ({ ...prev, [id]: 'Save failed — try again' }));

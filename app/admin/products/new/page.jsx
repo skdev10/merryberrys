@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { adminFetch } from '@/lib/adminClient';
+import { slugify } from '@/lib/adminProduct';
 import { ArrowLeft } from 'lucide-react';
 import ProductImagesField from '@/components/admin/ProductImagesField';
 
@@ -42,13 +44,7 @@ export default function NewProductPage() {
       const images = form.images.map((s) => String(s).trim()).filter(Boolean);
       const sizes = form.sizes.split(',').map((s) => s.trim()).filter(Boolean);
       const colors = form.colors.split(',').map((s) => s.trim()).filter(Boolean);
-      const slug =
-        form.name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '') +
-        '-' +
-        Date.now().toString(36);
+      const slug = `${slugify(form.name)}-${Date.now().toString(36)}`;
 
       const res = await adminFetch('/api/admin/products', {
         method: 'POST',
@@ -66,8 +62,10 @@ export default function NewProductPage() {
           inStock: form.inStock,
         }),
       });
-      if (res.ok) router.push('/admin/products');
-      else {
+      if (res.ok) {
+        toast.success('Product create ho gaya');
+        router.push('/admin/products');
+      } else {
         const data = await res.json();
         setError(data.message || 'Product create failed');
       }
