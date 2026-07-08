@@ -11,6 +11,7 @@ export default function NewProductPage() {
   const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -36,6 +37,7 @@ export default function NewProductPage() {
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     try {
       const images = form.images.map((s) => String(s).trim()).filter(Boolean);
       const sizes = form.sizes.split(',').map((s) => s.trim()).filter(Boolean);
@@ -65,6 +67,12 @@ export default function NewProductPage() {
         }),
       });
       if (res.ok) router.push('/admin/products');
+      else {
+        const data = await res.json();
+        setError(data.message || 'Product create failed');
+      }
+    } catch {
+      setError('Save failed — try again');
     } finally {
       setLoading(false);
     }
@@ -125,6 +133,7 @@ export default function NewProductPage() {
           images={form.images}
           onChange={(images) => setForm({ ...form, images })}
         />
+        {error && <p className="text-sm text-red-400">{error}</p>}
         <input
           className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white"
           placeholder="Sizes (comma-separated)"

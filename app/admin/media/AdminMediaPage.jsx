@@ -142,7 +142,11 @@ export default function AdminMediaPage() {
         <p className="text-zinc-500 text-sm max-w-2xl">
           Yahan se website ki <strong className="text-zinc-300">sari images</strong> change karein.
           Photo select karein → <strong className="text-zinc-300">Save page settings</strong> — website par
-          permanently update ho jayegi. Product photos → Products menu.
+          permanently update ho jayegi. Product photos →{' '}
+          <a href="/admin/product-images" className="text-berry-400 hover:underline">
+            Product Images
+          </a>{' '}
+          menu.
         </p>
       </div>
 

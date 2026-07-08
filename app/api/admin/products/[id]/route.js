@@ -73,6 +73,43 @@ export async function PUT(request, context) {
     }
 }
 
+// PATCH — update product images only
+export async function PATCH(request, context) {
+    const auth = await guardAdmin(request);
+    if (!auth.ok) return auth.response;
+    try {
+        const { id } = await context.params;
+        const data = await request.json();
+
+        if (!Array.isArray(data.images)) {
+            return NextResponse.json({ message: 'images array required' }, { status: 400 });
+        }
+
+        const images = data.images.map((s) => String(s).trim()).filter(Boolean);
+
+        const product = await prisma.product.update({
+            where: { id },
+            data: { images: JSON.stringify(images) },
+            include: { category: true },
+        });
+
+        const formattedProduct = {
+            ...product,
+            images: JSON.parse(product.images || '[]'),
+            sizes: JSON.parse(product.sizes || '[]'),
+            colors: JSON.parse(product.colors || '[]'),
+        };
+
+        return NextResponse.json({ product: formattedProduct });
+    } catch (error) {
+        console.error('Error updating product images:', error);
+        return NextResponse.json(
+            { message: 'Failed to update product images' },
+            { status: 500 }
+        );
+    }
+}
+
 // DELETE product
 export async function DELETE(request, context) {
     const auth = await guardAdmin(request);

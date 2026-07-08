@@ -6,6 +6,7 @@ import {
     ShoppingCart, 
     Users, 
     Image as ImageIcon,
+    Images,
     Settings,
     Store,
     Ticket,
@@ -19,6 +20,7 @@ import Link from "next/link"
 const menuItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Products', href: '/admin/products', icon: Package },
+    { name: 'Product Images', href: '/admin/product-images', icon: Images },
     { name: 'Categories', href: '/admin/categories', icon: Layers },
     { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
     { name: 'Customers', href: '/admin/customers', icon: Users },

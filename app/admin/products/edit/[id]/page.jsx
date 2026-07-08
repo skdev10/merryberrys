@@ -13,6 +13,7 @@ export default function EditProductPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '',
     slug: '',
@@ -63,11 +64,12 @@ export default function EditProductPage() {
   const submit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setError('');
     try {
       const images = form.images.map((s) => String(s).trim()).filter(Boolean);
       const sizes = form.sizes.split(',').map((s) => s.trim()).filter(Boolean);
       const colors = form.colors.split(',').map((s) => s.trim()).filter(Boolean);
-      await adminFetch(`/api/admin/products/${id}`, {
+      const res = await adminFetch(`/api/admin/products/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -83,7 +85,13 @@ export default function EditProductPage() {
           inStock: form.inStock,
         }),
       });
-      router.push('/admin/products');
+      if (res.ok) router.push('/admin/products');
+      else {
+        const data = await res.json();
+        setError(data.message || 'Save failed');
+      }
+    } catch {
+      setError('Save failed — try again');
     } finally {
       setSaving(false);
     }
@@ -153,6 +161,7 @@ export default function EditProductPage() {
           images={form.images}
           onChange={(images) => setForm({ ...form, images })}
         />
+        {error && <p className="text-sm text-red-400">{error}</p>}
         <input
           className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-3 text-white"
           value={form.sizes}
